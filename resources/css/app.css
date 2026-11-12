@@ -1,9 +1,50 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
+@font-face {
+    font-family: "Manrope";
+    src: url("../fonts/manrope-latin-wght-normal.woff2") format("woff2");
+    font-weight: 200 800;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Nunito Sans";
+    src: url("../fonts/nunito-sans-latin-wght-normal.woff2") format("woff2");
+    font-weight: 200 900;
+    font-display: swap;
+}
+
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-heading: "Manrope", ui-sans-serif, system-ui, sans-serif;
+    --color-coral: #fb7185;
+    --color-amber: #f59e0b;
+    --color-ink: #2b2423;
+    --color-muted: #655b58;
+    --color-paper: #fff8f3;
+    --color-line: #e9d9d2;
+    --color-control: #8c5b52;
+}
+
+@layer base {
+    :focus-visible {
+        outline: 3px solid var(--color-control);
+        outline-offset: 3px;
+    }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    [data-enter] {
+        animation: dashboard-enter 180ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+}
+
+@keyframes dashboard-enter {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
 }
