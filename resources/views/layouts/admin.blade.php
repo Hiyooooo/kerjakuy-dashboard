@@ -35,6 +35,13 @@
                         </span>
                         Dashboard
                     </a>
+                    @can('admin.accounts.manage')
+                        <a href="{{ route('admin.accounts.index') }}"
+                            @if (request()->routeIs('admin.accounts.*')) aria-current="page" @endif
+                            class="mt-1 flex min-h-11 items-center gap-3 rounded-[10px] px-3 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors">
+                            Pengguna
+                        </a>
+                    @endcan
                 </nav>
             </div>
         </aside>

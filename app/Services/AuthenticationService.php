@@ -3,10 +3,12 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Auth\SessionGuard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use LogicException;
 
 class AuthenticationService
 {
@@ -24,12 +26,19 @@ class AuthenticationService
         $accountKey = 'admin-login:account:'.hash('sha256', $normalizedEmail);
         $pairKey = 'admin-login:pair:'.hash('sha256', $normalizedEmail.'|'.$ip);
 
-        if (RateLimiter::tooManyAttempts($pairKey, self::PAIR_ATTEMPT_LIMIT)
-            || RateLimiter::tooManyAttempts($accountKey, self::ACCOUNT_ATTEMPT_LIMIT)) {
+        if (
+            RateLimiter::tooManyAttempts($pairKey, self::PAIR_ATTEMPT_LIMIT)
+            || RateLimiter::tooManyAttempts($accountKey, self::ACCOUNT_ATTEMPT_LIMIT)
+        ) {
             return false;
         }
 
         $guard = Auth::guard();
+
+        if (! ($guard instanceof SessionGuard)) {
+            throw new LogicException('Admin login requires a session guard.');
+        }
+
         $guard->setRememberDuration(self::REMEMBER_DURATION_MINUTES);
 
         $authenticated = $guard->attemptWhen(

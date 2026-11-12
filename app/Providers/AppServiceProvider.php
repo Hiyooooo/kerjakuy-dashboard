@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,10 +21,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Gate::define('admin.dashboard.view', fn (User $user): bool => $user->status === 'active'
-            && $user->roles()->whereHas(
-                'permissions',
-                fn (Builder $permissions) => $permissions->where('permissions.name', 'admin.dashboard.view'),
-            )->exists());
+        Gate::define('admin.dashboard.view', fn (User $user): bool => $user->hasPermission('admin.dashboard.view'));
+        Gate::define('admin.accounts.manage', fn (User $user): bool => $user->hasPermission('admin.accounts.manage'));
+        Gate::define('admin.accounts.change', fn (User $actor, User $account): bool => ! $actor->is($account)
+            && ! $account->roles()->exists()
+            && $actor->hasPermission('admin.accounts.manage'));
     }
 }

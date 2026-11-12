@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\AuthenticationController;
 use Illuminate\Support\Facades\Route;
@@ -15,3 +16,9 @@ Route::post('/logout', [AuthenticationController::class, 'logout'])
 Route::get('/', DashboardController::class)
     ->middleware(['auth', 'can:admin.dashboard.view'])
     ->name('admin.dashboard');
+
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.accounts.manage'])->group(function (): void {
+    Route::resource('accounts', AccountController::class)
+        ->except('show')
+        ->parameters(['accounts' => 'user']);
+});
