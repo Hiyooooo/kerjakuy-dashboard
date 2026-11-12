@@ -41,8 +41,14 @@
 
         <div>
             <header class="border-b border-line bg-white">
-                <div class="mx-auto flex min-h-16 max-w-[1160px] items-center px-[18px] text-sm font-bold text-muted md:px-8">
-                    Ruang kerja HR
+                <div class="mx-auto flex min-h-16 max-w-[1160px] items-center justify-between gap-3 px-[18px] text-sm font-bold text-muted md:px-8">
+                    <span>Ruang kerja HR</span>
+                    <form action="{{ route('logout') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="min-h-11 cursor-pointer rounded-[10px] px-3 text-ink hover:bg-paper motion-safe:transition-colors">
+                            Keluar
+                        </button>
+                    </form>
                 </div>
             </header>
             <main id="konten" tabindex="-1" class="mx-auto max-w-[1160px] px-[18px] py-8 md:px-8 md:py-12">
