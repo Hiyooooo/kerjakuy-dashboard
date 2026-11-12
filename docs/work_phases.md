@@ -18,7 +18,7 @@
 
 ## Tahap 1 — Login dan akses pengguna
 
-- [ ] Buat login, logout, dan proteksi route admin.
+- [x] Buat login, logout, dan proteksi route admin.
 - [ ] Buat manajemen pengguna.
 - [ ] Buat manajemen role.
 - [ ] Buat manajemen permission.
@@ -136,10 +136,3 @@
 - [ ] Uji endpoint API yang diperlukan aplikasi karyawan.
 - [ ] Jalankan migration dan seeder dari database kosong.
 - [ ] Dokumentasikan akun awal, konfigurasi environment, serta cara menjalankan proyek.
-
-## Pola modul admin
-
-- **Route dan controller.** Definisikan route web bernama `admin.<modul>.<aksi>` di `routes/web.php`. Tempatkan controller di `App\Http\Controllers\Admin`. Dashboard menggunakan controller invokable dan layout `layouts.admin`. Gunakan resource controller untuk modul CRUD.
-- **Validasi.** Gunakan Form Request di `App\Http\Requests\Admin` untuk input formulir dan filter. Controller memakai data dari `validated()`. Tampilkan kesalahan dekat kolom yang terkait dan pulihkan masukan formulir.
-- **Otorisasi.** Lindungi route modul dengan middleware autentikasi dan gunakan policy model untuk setiap aksi. Gunakan middleware `can` atau `Gate::authorize()` di server. Gunakan `@can` untuk menyelaraskan aksi yang terlihat di Blade. Login dan pemberian hak akses dikerjakan pada Tahap 1.
-- **Pagination.** Urutkan daftar secara deterministik dengan kolom unik sebagai pemutus seri. Gunakan `paginate(25)->withQueryString()` agar filter tetap aktif saat pindah halaman. Render paginator dengan `links()` dan berikan state kosong untuk hasil tanpa baris.
