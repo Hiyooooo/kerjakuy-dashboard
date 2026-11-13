@@ -11,16 +11,29 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'status'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
+    public const ACCOUNT_STATUSES = [
+        'active' => 'Aktif',
+        'inactive' => 'Nonaktif',
+        'suspended' => 'Ditangguhkan',
+        'pending' => 'Menunggu',
+    ];
+
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'user_roles');
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        return $this->status === 'active'
+            && $this->roles()->whereHas('permissions', fn ($query) => $query->where('permissions.name', $permission))->exists();
     }
 
     /**

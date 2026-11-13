@@ -14,8 +14,9 @@ class AdminAccessSeeder extends Seeder
     public function run(): void
     {
         $role = Role::firstOrCreate(['name' => 'admin']);
-        $permission = Permission::firstOrCreate(['name' => 'admin.dashboard.view']);
-
-        $role->permissions()->syncWithoutDetaching([$permission->getKey()]);
+        foreach (['admin.dashboard.view', 'admin.accounts.manage', 'admin.roles.manage'] as $name) {
+            $permission = Permission::firstOrCreate(['name' => $name]);
+            $role->permissions()->syncWithoutDetaching([$permission->getKey()]);
+        }
     }
 }
