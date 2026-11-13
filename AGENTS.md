@@ -120,6 +120,10 @@ Before relying on a package's API, confirm its installed version:
 
 </laravel-boost-guidelines>
 
+## Frontend skill
+
+- Always load `design-taste-frontend` from `C:/Users/Hp/.agents/skills/design-taste-frontend/SKILL.md` when analyzing, reviewing, or revising the KerjaKuy admin UI. Use it alongside `ui-craft` and apply the visual identity and interaction rules in `docs/design-system.md`.
+
 ## Project documentation
 
 Before making implementation changes, read these files in order:
