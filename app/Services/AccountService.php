@@ -4,13 +4,14 @@ namespace App\Services;
 
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class AccountService
 {
     public function paginate(int $perPage = 10): LengthAwarePaginator
     {
-        return User::withExists('roles')->orderByDesc('id')->paginate($perPage);
+        return User::with('role')->orderByDesc('id')->paginate($perPage);
     }
 
     public function create(array $data): User
@@ -34,11 +35,21 @@ class AccountService
             $user->email_verified_at = null;
         }
 
-        if ($user->isDirty(['email', 'password', 'status'])) {
+        if ($user->isDirty(['email', 'password', 'status', 'role_id'])) {
             $user->setRememberToken(null);
         }
 
-        $user->save();
+        $revokeSessions = $user->isDirty('password') && config('session.driver') === 'database';
+
+        DB::transaction(function () use ($user, $revokeSessions): void {
+            $user->save();
+
+            if ($revokeSessions) {
+                DB::connection(config('session.connection'))->table(config('session.table'))
+                    ->where('user_id', $user->getKey())
+                    ->delete();
+            }
+        });
 
         return $user;
     }

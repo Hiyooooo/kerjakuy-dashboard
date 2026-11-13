@@ -25,8 +25,7 @@ class ExampleTest extends TestCase
     {
         $this->freezeTime();
         $this->seed(AdminAccessSeeder::class);
-        $admin = User::factory()->create();
-        $admin->roles()->attach(Role::where('name', 'admin')->firstOrFail());
+        $admin = User::factory()->create(['role_id' => Role::where('code', 'super_admin')->firstOrFail()->id]);
 
         $response = $this->post(route('login.store'), [
             'email' => $admin->email,
@@ -49,9 +48,9 @@ class ExampleTest extends TestCase
         $this->get(route('admin.dashboard'))->assertRedirectToRoute('login');
     }
 
-    public function test_user_without_dashboard_permission_cannot_access_admin(): void
+    public function test_inactive_user_cannot_access_admin(): void
     {
-        $user = User::factory()->create();
+        $user = User::factory()->create(['status' => 'inactive']);
 
         $this->post(route('login.store'), [
             'email' => $user->email,
@@ -66,7 +65,6 @@ class ExampleTest extends TestCase
     {
         $this->seed(AdminAccessSeeder::class);
         $admin = User::factory()->create(['status' => 'suspended']);
-        $admin->roles()->attach(Role::where('name', 'admin')->firstOrFail());
 
         $this->post(route('login.store'), [
             'email' => $admin->email,
@@ -80,10 +78,7 @@ class ExampleTest extends TestCase
     public function test_login_limit_does_not_block_a_different_account_on_the_same_ip(): void
     {
         $this->seed(AdminAccessSeeder::class);
-        $role = Role::where('name', 'admin')->firstOrFail();
         [$admin, $colleague] = User::factory()->count(2)->create();
-        $admin->roles()->attach($role);
-        $colleague->roles()->attach($role);
         $this->withServerVariables(['REMOTE_ADDR' => '192.0.2.10']);
 
         for ($attempt = 0; $attempt < 5; $attempt++) {
@@ -110,8 +105,7 @@ class ExampleTest extends TestCase
     {
         $this->freezeTime();
         $this->seed(AdminAccessSeeder::class);
-        $admin = User::factory()->create();
-        $admin->roles()->attach(Role::where('name', 'admin')->firstOrFail());
+        $admin = User::factory()->create(['role_id' => Role::where('code', 'super_admin')->firstOrFail()->id]);
 
         foreach (['192.0.2.10', '192.0.2.11'] as $ip) {
             $this->withServerVariables(['REMOTE_ADDR' => $ip]);

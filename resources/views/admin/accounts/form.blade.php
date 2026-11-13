@@ -49,6 +49,20 @@
         @endforeach
 
         <div>
+            <label for="role_id" class="block text-sm font-bold">Role</label>
+            <select id="role_id" name="role_id" required class="mt-1 min-h-12 w-full rounded-[10px] border border-control px-3"
+                @error('role_id') aria-invalid="true" aria-describedby="role-error" @enderror>
+                <option value="">Pilih role</option>
+                @foreach ($roles as $role)
+                    <option value="{{ $role->id }}" @selected((string) old('role_id', $account->role_id) === (string) $role->id)>{{ $role->name }}</option>
+                @endforeach
+            </select>
+            @error('role_id')
+                <p id="role-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div>
             <label for="status" class="block text-sm font-bold">Status akun</label>
             <select id="status" name="status" required class="mt-1 min-h-12 w-full rounded-[10px] border border-[#8b807b] px-3 aria-invalid:border-[#b42318]"
                 @error('status') aria-invalid="true" aria-describedby="status-error" @enderror>

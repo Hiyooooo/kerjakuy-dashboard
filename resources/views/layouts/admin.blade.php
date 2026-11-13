@@ -38,9 +38,9 @@
                         </span>
                         Dashboard
                     </a>
-                    @canany(['admin.accounts.manage', 'admin.roles.manage', 'admin.permissions.manage'])
+                    @can('admin.accounts.manage')
                         <p class="hidden px-3 text-xs font-extrabold text-muted md:mt-5 md:block">Akses</p>
-                    @endcanany
+                    @endcan
                     @can('admin.accounts.manage')
                         <a href="{{ route('admin.accounts.index') }}"
                             @if (request()->routeIs('admin.accounts.*')) aria-current="page" @endif
@@ -49,23 +49,6 @@
                                 <circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2m1-18a4 4 0 0 1 0 8m5 10v-2a4 4 0 0 0-3-4"/>
                             </svg>
                             Pengguna
-                        </a>
-                    @endcan
-                    @can('admin.roles.manage')
-                        <a href="{{ route('admin.roles.index') }}"
-                            @if (request()->routeIs('admin.roles.*')) aria-current="page" @endif
-                            class="flex min-h-11 items-center gap-2 rounded-[10px] px-2 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors md:mt-1 md:gap-3 md:px-3">
-                            <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M12 22s7-3 7-9V5l-7-3-7 3v8c0 6 7 9 7 9Z"/><path d="m9 12 2 2 4-4"/>
-                            </svg>
-                            Role
-                        </a>
-                    @endcan
-                    @can('admin.permissions.manage')
-                        <a href="{{ route('admin.permissions.index') }}"
-                            @if (request()->routeIs('admin.permissions.*')) aria-current="page" @endif
-                            class="mt-1 flex min-h-11 items-center rounded-[10px] px-3 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors">
-                            Permission
                         </a>
                     @endcan
                 </nav>

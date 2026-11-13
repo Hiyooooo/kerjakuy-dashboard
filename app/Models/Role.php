@@ -4,23 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['name', 'description'])]
+#[Fillable(['code', 'name', 'description'])]
 class Role extends Model
 {
-    public function users(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'user_roles');
-    }
+    public const ASSIGNABLE = ['hrd_admin', 'attendance_admin'];
 
-    public function isSystemRole(): bool
+    public function users(): HasMany
     {
-        return $this->name === 'admin';
-    }
-
-    public function permissions(): BelongsToMany
-    {
-        return $this->belongsToMany(Permission::class, 'role_permissions');
+        return $this->hasMany(User::class);
     }
 }

@@ -36,9 +36,7 @@
                                     <div class="min-w-0">
                                         <span class="wrap-anywhere">{{ $account->name }}</span>
                                         <span class="block font-normal wrap-anywhere text-muted">{{ $account->email }}</span>
-                                        @if ($account->roles_exists)
-                                            <span class="mt-1 block text-xs font-bold text-muted">Akun ber-role</span>
-                                        @endif
+                                        <span class="mt-1 block text-xs font-bold text-muted">{{ $account->role->name }}</span>
                                     </div>
                                 </div>
                             </th>
@@ -53,12 +51,11 @@
                                 </span>
                             </td>
                             <td class="px-2 py-3 text-right sm:px-5">
-                                @if ($account->roles_exists)
-                                    <span aria-hidden="true" class="text-muted">—</span>
-                                    <span class="sr-only">Tidak dapat diedit</span>
-                                @else
+                                @can('admin.accounts.change', $account)
                                     <a href="{{ route('admin.accounts.edit', $account) }}" aria-label="Edit {{ $account->name }}" class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-[10px] px-2 font-bold underline decoration-control/50 underline-offset-4 hover:bg-coral/15">Edit</a>
-                                @endif
+                                @else
+                                    <span class="text-muted">Dilindungi</span>
+                                @endcan
                             </td>
                         </tr>
                     @endforeach
