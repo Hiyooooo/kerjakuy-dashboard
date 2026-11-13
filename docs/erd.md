@@ -1,18 +1,18 @@
 # ERD KerjaKuy Admin Panel
 
-ERD lengkap dan DBML final disimpan di [Notion](https://app.notion.com/p/415cb38cb4748149bb22c24384cae788?pvs=204). Dokumen ini merangkum relasi serta aturan penting saat membuat migration Laravel.
+ERD lengkap dan DBML final disimpan di D:\Coding\Akarindo\10 Website\admin-panel\output-pembahasan\database-final-kerjakuy.dbml Dokumen ini merangkum relasi serta aturan penting saat membuat migration Laravel.
 
 ## Kelompok data
 
-| Area | Tabel inti |
-| --- | --- |
-| Akses | `users`, `roles`, `permissions`, `user_roles`, `role_permissions` |
-| Organisasi | `offices`, `positions`, `job_desks` |
-| Pegawai | `employees`, identitas, profil pajak, keluarga, pendidikan, kepegawaian, karir, pelatihan, pembinaan, dan riwayat status |
-| Jadwal & absensi | shift, template jadwal, penugasan jadwal, jadwal harian, perangkat, absensi, lokasi, dan face recognition |
-| Permohonan | kuota cuti, penyesuaian saldo, cuti, terlambat, lembur, dan tukar shift |
-| Master kompensasi | BPJS, tunjangan, potongan, PTKP, PKP, dan bracket pajak |
-| Konten | e-learning, pertanyaan, penugasan, jawaban, e-library, dan lampiran |
+| Area              | Tabel inti                                                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Akses             | `users`, `roles`, `permissions`, `user_roles`, `role_permissions`                                                        |
+| Organisasi        | `offices`, `positions`, `job_desks`                                                                                      |
+| Pegawai           | `employees`, identitas, profil pajak, keluarga, pendidikan, kepegawaian, karir, pelatihan, pembinaan, dan riwayat status |
+| Jadwal & absensi  | shift, template jadwal, penugasan jadwal, jadwal harian, perangkat, absensi, lokasi, dan face recognition                |
+| Permohonan        | kuota cuti, penyesuaian saldo, cuti, terlambat, lembur, dan tukar shift                                                  |
+| Master kompensasi | BPJS, tunjangan, potongan, PTKP, PKP, dan bracket pajak                                                                  |
+| Konten            | e-learning, pertanyaan, penugasan, jawaban, e-library, dan lampiran                                                      |
 
 ## Relasi penting
 

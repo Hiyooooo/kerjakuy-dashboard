@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Role;
 use App\Models\User;
 use Closure;
 use Illuminate\Foundation\Http\FormRequest;
@@ -39,6 +40,7 @@ class StoreAccountRequest extends FormRequest
             'name' => ['required', 'string', 'max:150'],
             'email' => ['required', 'string', 'email', 'max:150', $uniqueEmail],
             'status' => ['required', Rule::in(array_keys(User::ACCOUNT_STATUSES))],
+            'role_id' => ['required', 'integer', Rule::exists(Role::class, 'id')->whereIn('code', Role::ASSIGNABLE)],
             'password' => [
                 'bail', $account === null ? 'required' : 'nullable', 'string', 'min:12', 'confirmed',
                 function (string $attribute, string $value, Closure $fail): void {
