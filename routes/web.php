@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\AccountController;
+use App\Access\Http\Controllers\Admin\AccountController;
+use App\Access\Http\Controllers\Admin\AuthenticationController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\OfficeController;
-use App\Http\Controllers\Admin\PositionController;
-use App\Http\Controllers\AuthenticationController;
+use App\Organization\Http\Controllers\Admin\OfficeController;
+use App\Organization\Http\Controllers\Admin\PositionController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function (): void {

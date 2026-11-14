@@ -47,7 +47,7 @@
                                     'bg-paper text-muted' => $account->status !== 'active',
                                 ])>
                                     <span aria-hidden="true" @class(['size-2 rounded-full border border-current', 'bg-current' => $account->status === 'active'])></span>
-                                    {{ \App\Models\User::ACCOUNT_STATUSES[$account->status] }}
+                                    {{ \App\Access\Models\User::ACCOUNT_STATUSES[$account->status] }}
                                 </span>
                             </td>
                             <td class="px-2 py-3 text-right sm:px-5">

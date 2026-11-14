@@ -66,7 +66,7 @@
             <label for="status" class="block text-sm font-bold">Status akun</label>
             <select id="status" name="status" required class="mt-1 min-h-12 w-full rounded-[10px] border border-[#8b807b] px-3 aria-invalid:border-[#b42318]"
                 @error('status') aria-invalid="true" aria-describedby="status-error" @enderror>
-                @foreach (\App\Models\User::ACCOUNT_STATUSES as $value => $label)
+                @foreach (\App\Access\Models\User::ACCOUNT_STATUSES as $value => $label)
                     <option value="{{ $value }}" @selected(old('status', $account->status ?? 'active') === $value)>{{ $label }}</option>
                 @endforeach
             </select>
