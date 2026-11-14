@@ -48,9 +48,9 @@ Urutan ini adalah rencana implementasi admin panel KerjaKuy. Tahap 1–5 membang
 
 - [x] Siapkan aplikasi Laravel dan konfigurasi environment.
 - [x] Pasang Laravel Boost sesuai instruksi proyek sebelum mengubah aplikasi.
-- [ ] Konfigurasi koneksi PostgreSQL bersama untuk admin panel dan API aplikasi karyawan.
-- [ ] Buat struktur layout admin panel, sidebar, topbar, dan halaman dashboard awal.
-- [ ] Siapkan pola route, controller, request validation, policy, dan pagination.
+- [x] Konfigurasi koneksi PostgreSQL bersama untuk admin panel dan API aplikasi karyawan.
+- [x] Buat struktur layout admin panel, sidebar, topbar, dan halaman dashboard awal.
+- [x] Siapkan pola route, controller, request validation, policy, dan pagination.
 
 **Selesai jika:** admin dapat membuka aplikasi Laravel lokal, melihat layout admin panel, dan koneksi PostgreSQL berhasil.
 
@@ -70,10 +70,10 @@ Untuk instalasi baru, isi `KERJAKUY_ADMIN_EMAIL` dan `KERJAKUY_ADMIN_PASSWORD`, 
 
 ## Tahap 2 — Master organisasi dan absensi
 
-- [ ] Buat master jabatan.
-- [ ] Buat master kantor.
-- [ ] Buat job desk dan spesifikasi jabatan.
-- [ ] Buat master waktu absen.
+- [x] Buat master jabatan.
+- [x] Buat master kantor.
+- [x] Buat job desk dan spesifikasi jabatan.
+- [x] Buat master waktu absen.
 - [ ] Buat kategori cuti.
 - [ ] Buat hari libur global dan hari libur per kantor.
 - [ ] Buat alasan di luar lokasi.

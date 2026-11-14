@@ -27,9 +27,9 @@ class PositionService
     public function delete(Position $record): void
     {
         try {
-            $record->delete();
+            $record->deleteOrFail();
         } catch (QueryException $exception) {
-            $foreignKeyViolation = $exception->getCode() === '23503'
+            $foreignKeyViolation = in_array($exception->getCode(), ['23503', '23001'], true)
                 || ($exception->getCode() === '23000' && str_contains($exception->getMessage(), 'FOREIGN KEY constraint failed'));
 
             if (! $foreignKeyViolation) {

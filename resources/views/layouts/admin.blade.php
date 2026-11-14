@@ -53,7 +53,7 @@
                     @endcan
                     @can('admin.organization.manage')
                         <p class="hidden px-3 text-xs font-extrabold text-muted md:mt-5 md:block">Organisasi</p>
-                        @foreach (['positions' => 'Jabatan', 'offices' => 'Kantor'] as $masterRoute => $masterLabel)
+                        @foreach (['positions' => 'Jabatan', 'offices' => 'Kantor', 'job-desks' => 'Job desk', 'attendance-times' => 'Waktu absen'] as $masterRoute => $masterLabel)
                             <a href="{{ route('admin.'.$masterRoute.'.index') }}"
                                 @if (request()->routeIs('admin.'.$masterRoute.'.*')) aria-current="page" @endif
                                 class="flex min-h-11 items-center rounded-[10px] px-3 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors md:mt-1">

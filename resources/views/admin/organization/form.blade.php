@@ -11,12 +11,23 @@
     <a href="{{ route('admin.'.$resource.'.index') }}" class="inline-flex min-h-11 items-center font-bold underline decoration-control/50 underline-offset-4">Kembali ke {{ Str::lower($label) }}</a>
     <h1 data-enter class="mt-2 font-heading text-[40px] leading-tight font-extrabold tracking-tight">{{ $title }}</h1>
 
+    @if ($resource === 'job-desks' && $positions->isEmpty())
+        <div class="mt-6 max-w-xl rounded-[22px] border border-line bg-white p-6">
+            <p class="text-muted">Tambahkan jabatan untuk membuat job desk.</p>
+            <a href="{{ route('admin.positions.create') }}" class="mt-3 inline-flex min-h-11 items-center font-bold underline decoration-control/50 underline-offset-4">Tambah jabatan</a>
+        </div>
+    @else
     <form method="POST" action="{{ $editing ? route('admin.'.$resource.'.update', $record) : route('admin.'.$resource.'.store') }}" class="mt-6 grid max-w-xl gap-5 rounded-[22px] border border-line bg-white p-6">
         @csrf
         @if ($editing)
             @method('PUT')
         @endif
 
+        @if ($resource === 'job-desks')
+            @include('admin.organization.job-desk-fields')
+        @elseif ($resource === 'attendance-times')
+            @include('admin.organization.attendance-time-fields')
+        @else
         @foreach (['code' => ['Kode', 30], 'name' => ['Nama', $nameLimit]] as $field => [$fieldLabel, $limit])
             <div>
                 <label for="{{ $field }}" class="block text-sm font-bold">{{ $fieldLabel }} {{ Str::lower($label) }}</label>
@@ -58,6 +69,7 @@
                 </div>
             </fieldset>
         @endif
+        @endif
 
         <div>
             <label for="is_active" class="block text-sm font-bold">Status</label>
@@ -73,6 +85,7 @@
 
         <button type="submit" class="min-h-12 w-fit cursor-pointer rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">Simpan {{ Str::lower($label) }}</button>
     </form>
+    @endif
 
     @if ($editing)
         <details class="mt-4 max-w-xl rounded-[22px] border border-line bg-white px-6 py-2" @if ($errors->has('delete')) open @endif>
@@ -80,7 +93,7 @@
             <form method="POST" action="{{ route('admin.'.$resource.'.destroy', $record) }}" class="space-y-3 pb-4">
                 @csrf
                 @method('DELETE')
-                <p>Hapus {{ $record->name }} secara permanen?</p>
+                <p>Hapus {{ $resource === 'job-desks' ? $record->title : $record->name }} secara permanen?</p>
                 @error('delete')
                     <p role="alert" class="text-sm text-[#b42318]">{{ $message }}</p>
                 @enderror
