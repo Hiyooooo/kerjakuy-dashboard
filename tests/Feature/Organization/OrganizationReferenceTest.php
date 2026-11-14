@@ -7,7 +7,10 @@ use App\Access\Models\User;
 use App\Organization\Models\AttendanceTime;
 use App\Organization\Models\JobDesk;
 use App\Organization\Models\Position;
+use App\Organization\Services\AttendanceTimeService;
+use App\Organization\Services\JobDeskService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
 class OrganizationReferenceTest extends TestCase
@@ -64,18 +67,25 @@ class OrganizationReferenceTest extends TestCase
             'check_in_start' => '21:30',
             'expected_check_in' => '22:00',
             'expected_check_out' => '06:00',
+            'expected_check_out_day' => 1,
             'check_out_end' => '07:00',
+            'check_out_end_day' => 1,
         ]);
         $this->post(route('admin.attendance-times.store'), $data)->assertRedirectToRoute('admin.attendance-times.index');
         $time = AttendanceTime::sole();
         $this->post(route('admin.attendance-times.store'), $data)->assertSessionHasErrors('name');
         $this->get(route('admin.attendance-times.index'))->assertOk()->assertSee('22:00–06:00')->assertSee('hari berikutnya');
-        $this->get(route('admin.attendance-times.edit', $time))->assertOk()->assertSee('value="07:00"', false);
+        $this->get(route('admin.attendance-times.edit', $time))->assertOk()
+            ->assertSee('value="07:00"', false)
+            ->assertSee('Hari mulai absen masuk')
+            ->assertSee('Hari batas absen pulang')
+            ->assertSee('value="1" selected>Hari berikutnya', false);
 
         $this->put(route('admin.attendance-times.update', $time), [...$data, 'is_active' => '0', 'check_out_end' => null])
             ->assertRedirectToRoute('admin.attendance-times.index');
         $time->refresh();
         $this->assertNull($time->check_out_end);
+        $this->assertSame(0, $time->check_out_end_day);
         $this->assertFalse($time->is_active);
         $this->delete(route('admin.attendance-times.destroy', $time))->assertRedirectToRoute('admin.attendance-times.index');
         $this->assertModelMissing($time);
@@ -95,14 +105,59 @@ class OrganizationReferenceTest extends TestCase
 
         $this->post(route('admin.attendance-times.store'), [...$data, 'check_out_end' => '16:45'])
             ->assertSessionHasErrors('check_out_end');
+        $this->post(route('admin.attendance-times.store'), [...$data, 'check_out_end' => '07:00'])
+            ->assertSessionHasErrors('check_out_end');
+        $this->post(route('admin.attendance-times.store'), [...$data, 'expected_check_out_day' => 1])
+            ->assertSessionHasErrors('expected_check_out');
         $this->post(route('admin.attendance-times.store'), [
             ...$data,
             'check_in_start' => '21:30',
             'expected_check_in' => '22:00',
             'expected_check_out' => '06:00',
+            'expected_check_out_day' => 1,
             'check_out_end' => '05:30',
+            'check_out_end_day' => 1,
         ])->assertSessionHasErrors('check_out_end');
         $this->assertDatabaseCount('attendance_times', 0);
+
+        $this->post(route('admin.attendance-times.store'), [...$data, 'check_out_end' => '07:00', 'check_out_end_day' => 1])
+            ->assertRedirectToRoute('admin.attendance-times.index');
+        $this->assertSame(1, AttendanceTime::sole()->check_out_end_day);
+    }
+
+    public function test_attendance_time_can_open_check_in_the_previous_day(): void
+    {
+        $this->actingAs(User::factory()->for(Role::where('code', 'hrd_admin')->firstOrFail())->create()->refresh());
+        $data = AttendanceTime::factory()->raw([
+            'check_in_start' => '23:30',
+            'expected_check_in' => '00:00',
+            'expected_check_out' => '08:00',
+            'check_out_end' => '09:00',
+        ]);
+
+        $this->post(route('admin.attendance-times.store'), $data)->assertSessionHasErrors('check_in_start');
+        $this->post(route('admin.attendance-times.store'), [...$data, 'check_in_start_day' => -1])
+            ->assertRedirectToRoute('admin.attendance-times.index');
+        $this->assertSame(-1, AttendanceTime::sole()->check_in_start_day);
+    }
+
+    public function test_database_duplicate_conflicts_are_reported_on_the_form_field(): void
+    {
+        $jobDesk = JobDesk::factory()->create();
+        $otherJobDesk = JobDesk::factory()->create(['position_id' => $jobDesk->position_id]);
+        $time = AttendanceTime::factory()->create();
+        $otherTime = AttendanceTime::factory()->create();
+
+        foreach ([
+            [app(JobDeskService::class), $jobDesk, $otherJobDesk, 'title'],
+            [app(AttendanceTimeService::class), $time, $otherTime, 'name'],
+        ] as [$service, $existing, $other, $field]) {
+            $data = $existing->only($existing->getFillable());
+            $hasFieldError = fn (ValidationException $exception): bool => isset($exception->errors()[$field]);
+            $this->assertThrows(fn () => $service->create($data), $hasFieldError);
+            $this->assertThrows(fn () => $service->update($data, $other), $hasFieldError);
+            $this->assertNotSame($existing->{$field}, $other->fresh()->{$field});
+        }
     }
 
     public function test_guests_and_attendance_admins_cannot_manage_the_new_references(): void

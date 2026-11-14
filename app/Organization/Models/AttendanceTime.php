@@ -8,7 +8,11 @@ use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-#[Fillable(['name', 'check_in_start', 'expected_check_in', 'expected_check_out', 'check_out_end', 'late_tolerance_minutes', 'is_active'])]
+#[Fillable([
+    'name', 'check_in_start', 'check_in_start_day', 'expected_check_in',
+    'expected_check_out', 'expected_check_out_day', 'check_out_end', 'check_out_end_day',
+    'late_tolerance_minutes', 'is_active',
+])]
 #[UseFactory(AttendanceTimeFactory::class)]
 class AttendanceTime extends Model
 {
@@ -17,6 +21,12 @@ class AttendanceTime extends Model
 
     protected function casts(): array
     {
-        return ['is_active' => 'boolean', 'late_tolerance_minutes' => 'integer'];
+        return [
+            'check_in_start_day' => 'integer',
+            'expected_check_out_day' => 'integer',
+            'check_out_end_day' => 'integer',
+            'is_active' => 'boolean',
+            'late_tolerance_minutes' => 'integer',
+        ];
     }
 }
