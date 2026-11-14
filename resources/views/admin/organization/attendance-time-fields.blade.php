@@ -10,7 +10,7 @@
 
 <fieldset aria-describedby="attendance-time-hint" class="grid gap-3">
     <legend class="mb-2 text-sm font-bold">Jam masuk dan pulang</legend>
-    <p id="attendance-time-hint" class="text-sm text-muted">Jam pulang dan batas absen pulang yang lebih awal dari jam masuk dihitung pada hari berikutnya.</p>
+    <p id="attendance-time-hint" class="text-sm text-muted">Hari kerja dimulai pada tanggal jam masuk. Pilih hari sebelumnya atau berikutnya jika waktu absen melewati tengah malam.</p>
     <div class="grid gap-3 sm:grid-cols-2">
         @foreach ([
             'check_in_start' => 'Mulai absen masuk',
@@ -18,6 +18,7 @@
             'expected_check_out' => 'Jam pulang',
             'check_out_end' => 'Batas absen pulang (opsional)',
         ] as $field => $fieldLabel)
+            @php($dayField = $field.'_day')
             <div>
                 <label for="{{ $field }}" class="block text-sm font-bold">{{ $fieldLabel }}</label>
                 <input id="{{ $field }}" name="{{ $field }}" type="time"
@@ -27,6 +28,25 @@
                 @error($field)
                     <p id="{{ $field }}-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
                 @enderror
+                @if ($field !== 'expected_check_in')
+                    <label for="{{ $dayField }}" class="mt-2 block text-sm font-bold">{{ match ($field) {
+                        'check_in_start' => 'Hari mulai absen masuk',
+                        'expected_check_out' => 'Hari pulang',
+                        'check_out_end' => 'Hari batas absen pulang',
+                    } }}</label>
+                    <select id="{{ $dayField }}" name="{{ $dayField }}" class="mt-1 min-h-12 w-full rounded-[10px] border border-control px-3"
+                        @error($dayField) aria-invalid="true" aria-describedby="{{ $dayField }}-error" @enderror>
+                        <option value="0" @selected((string) old($dayField, $record->{$dayField} ?? 0) === '0')>Hari yang sama</option>
+                        @if ($field === 'check_in_start')
+                            <option value="-1" @selected((string) old($dayField, $record->{$dayField}) === '-1')>Hari sebelumnya</option>
+                        @else
+                            <option value="1" @selected((string) old($dayField, $record->{$dayField}) === '1')>Hari berikutnya</option>
+                        @endif
+                    </select>
+                    @error($dayField)
+                        <p id="{{ $dayField }}-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
+                    @enderror
+                @endif
             </div>
         @endforeach
     </div>

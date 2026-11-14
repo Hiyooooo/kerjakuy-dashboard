@@ -40,7 +40,7 @@
                                 @elseif ($resource === 'attendance-times')
                                     <span class="mt-0.5 block font-normal text-muted tabular-nums">
                                         {{ substr($record->expected_check_in, 0, 5) }}–{{ substr($record->expected_check_out, 0, 5) }}
-                                        @if ($record->expected_check_out < $record->expected_check_in)
+                                        @if ($record->expected_check_out_day === 1)
                                             (hari berikutnya)
                                         @endif
                                     </span>

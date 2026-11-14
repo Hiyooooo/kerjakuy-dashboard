@@ -3,7 +3,9 @@
 namespace App\Organization\Services;
 
 use App\Organization\Models\JobDesk;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Validation\ValidationException;
 
 class JobDeskService
 {
@@ -14,12 +16,21 @@ class JobDeskService
 
     public function create(array $data): JobDesk
     {
-        return JobDesk::create($data);
+        $record = new JobDesk;
+        $this->update($data, $record);
+
+        return $record;
     }
 
     public function update(array $data, JobDesk $record): void
     {
-        $record->update($data);
+        try {
+            $record->fill($data)->saveOrFail();
+        } catch (UniqueConstraintViolationException) {
+            throw ValidationException::withMessages([
+                'title' => 'Judul ini sudah dipakai pada jabatan yang sama.',
+            ]);
+        }
     }
 
     public function delete(JobDesk $record): void

@@ -4,6 +4,7 @@ namespace App\Organization\Services;
 
 use App\Organization\Models\AttendanceTime;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Validation\ValidationException;
 
@@ -16,12 +17,21 @@ class AttendanceTimeService
 
     public function create(array $data): AttendanceTime
     {
-        return AttendanceTime::create($data);
+        $record = new AttendanceTime;
+        $this->update($data, $record);
+
+        return $record;
     }
 
     public function update(array $data, AttendanceTime $record): void
     {
-        $record->update($data);
+        try {
+            $record->fill($data)->saveOrFail();
+        } catch (UniqueConstraintViolationException) {
+            throw ValidationException::withMessages([
+                'name' => 'Nama waktu absen ini sudah dipakai.',
+            ]);
+        }
     }
 
     public function delete(AttendanceTime $record): void

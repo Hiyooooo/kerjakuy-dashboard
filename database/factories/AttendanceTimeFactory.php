@@ -15,9 +15,12 @@ class AttendanceTimeFactory extends Factory
         return [
             'name' => 'Waktu absen '.fake()->unique()->numerify('#####'),
             'check_in_start' => '07:30',
+            'check_in_start_day' => 0,
             'expected_check_in' => '08:00',
             'expected_check_out' => '17:00',
+            'expected_check_out_day' => 0,
             'check_out_end' => '18:00',
+            'check_out_end_day' => 0,
             'late_tolerance_minutes' => 0,
             'is_active' => true,
         ];
