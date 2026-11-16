@@ -65,6 +65,8 @@
 
         @if ($resource === 'attendance-methods')
             @include('admin.organization.attendance-method-fields')
+        @elseif ($resource === 'attendance-locations')
+            @include('admin.organization.attendance-location-fields')
         @elseif ($resource === 'out-of-location-reasons')
             <div>
                 <label for="requires_note" class="block text-sm font-bold">Catatan pegawai</label>
@@ -129,7 +131,7 @@
     </form>
     @endif
 
-    @if ($editing && $resource !== 'attendance-methods')
+    @if ($editing && ! in_array($resource, ['attendance-methods', 'attendance-locations'], true))
         <details class="mt-4 max-w-xl rounded-[22px] border border-line bg-white px-6 py-2" @if ($errors->has('delete')) open @endif>
             <summary class="min-h-11 cursor-pointer py-3 font-bold text-[#b42318]">Hapus {{ Str::lower($label) }}</summary>
             <form method="POST" action="{{ route('admin.'.$resource.'.destroy', [$record, ...$routeFilters]) }}" class="space-y-3 pb-4">

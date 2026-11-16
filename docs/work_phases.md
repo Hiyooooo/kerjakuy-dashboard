@@ -78,8 +78,8 @@ Untuk instalasi baru, isi `KERJAKUY_ADMIN_EMAIL` dan `KERJAKUY_ADMIN_PASSWORD`, 
 - [x] Buat hari libur global dan hari libur per kantor.
 - [x] Buat alasan di luar lokasi.
 - [x] Buat metode absen.
-- [ ] Buat kebijakan toleransi wajah dengan periode berlaku.
-- [ ] Buat lokasi absen dan radius lokasi.
+- [x] Buat kebijakan toleransi wajah dengan periode berlaku.
+- [x] Buat lokasi absen dan radius lokasi.
 - [ ] Tunda setting absensi sampai detail field pengaturannya disepakati.
 
 **Selesai jika:** semua referensi utama tersedia untuk dipakai pada data pegawai, jadwal, absensi, dan permohonan.
