@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#fff8f3">
     <title>Masuk | KerjaKuy</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="grid min-h-screen place-items-center bg-paper px-[18px] py-8 font-sans text-ink">
     <main class="w-full max-w-[400px] rounded-[22px] border border-line bg-white p-6 sm:p-8">
         <div class="mb-6 flex items-center gap-3 font-heading text-xl font-extrabold tracking-tight">
-            <span aria-hidden="true" class="grid size-9 place-items-center rounded-[12px] rounded-bl-[4px] bg-coral text-lg">K</span>
+            <img src="{{ asset('icon.svg') }}" alt="" width="36" height="36" class="size-9 shrink-0">
             KerjaKuy
         </div>
         <h1 class="font-heading text-[32px] leading-tight font-extrabold tracking-tight">Masuk ke admin panel</h1>

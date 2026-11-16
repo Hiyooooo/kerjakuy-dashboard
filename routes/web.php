@@ -4,7 +4,9 @@ use App\Access\Http\Controllers\Admin\AccountController;
 use App\Access\Http\Controllers\Admin\AuthenticationController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Organization\Http\Controllers\Admin\AttendanceTimeController;
+use App\Organization\Http\Controllers\Admin\HolidayController;
 use App\Organization\Http\Controllers\Admin\JobDeskController;
+use App\Organization\Http\Controllers\Admin\LeaveCategoryController;
 use App\Organization\Http\Controllers\Admin\OfficeController;
 use App\Organization\Http\Controllers\Admin\PositionController;
 use Illuminate\Support\Facades\Route;
@@ -26,6 +28,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.organizat
     Route::resource('offices', OfficeController::class)->except('show');
     Route::resource('job-desks', JobDeskController::class)->except('show');
     Route::resource('attendance-times', AttendanceTimeController::class)->except('show');
+    Route::resource('leave-categories', LeaveCategoryController::class)->except('show');
+    Route::post('holidays/import', [HolidayController::class, 'import'])->middleware('throttle:6,1')->name('holidays.import');
+    Route::resource('holidays', HolidayController::class)->except('show');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.accounts.manage'])->group(function (): void {
