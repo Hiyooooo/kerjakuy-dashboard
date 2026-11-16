@@ -50,6 +50,9 @@
                                 @elseif ($resource === 'attendance-methods')
                                     @php($enabledRequirements = array_filter($requirements, fn ($field) => $record->{$field}, ARRAY_FILTER_USE_KEY))
                                     <span class="mt-1 block font-normal text-muted">{{ $enabledRequirements ? implode(', ', $enabledRequirements) : 'Tanpa syarat tambahan' }}</span>
+                                @elseif ($resource === 'attendance-locations')
+                                    <span class="mt-1 block font-normal text-muted">{{ $record->office?->name ?? 'Tanpa kantor' }}</span>
+                                    <span class="mt-0.5 block text-xs font-semibold text-muted">Radius {{ number_format($record->radius_meter, 0, ',', '.') }} m</span>
                                 @else
                                     @if ($resource !== 'leave-categories')
                                         <span class="mt-0.5 block text-xs font-semibold text-muted">{{ $record->code }}</span>

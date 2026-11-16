@@ -3,8 +3,10 @@
 use App\Access\Http\Controllers\Admin\AccountController;
 use App\Access\Http\Controllers\Admin\AuthenticationController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Organization\Http\Controllers\Admin\AttendanceLocationController;
 use App\Organization\Http\Controllers\Admin\AttendanceMethodController;
 use App\Organization\Http\Controllers\Admin\AttendanceTimeController;
+use App\Organization\Http\Controllers\Admin\FaceTolerancePolicyController;
 use App\Organization\Http\Controllers\Admin\HolidayController;
 use App\Organization\Http\Controllers\Admin\JobDeskController;
 use App\Organization\Http\Controllers\Admin\LeaveCategoryController;
@@ -35,6 +37,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.organizat
     Route::resource('holidays', HolidayController::class)->except('show');
     Route::resource('out-of-location-reasons', OutOfLocationReasonController::class)->except('show');
     Route::resource('attendance-methods', AttendanceMethodController::class)->except(['show', 'destroy']);
+    Route::resource('attendance-locations', AttendanceLocationController::class)->except(['show', 'destroy']);
+    Route::resource('face-tolerance-policies', FaceTolerancePolicyController::class)->except(['show', 'destroy']);
+    Route::get('face-tolerance-policies/{face_tolerance_policy}/replacement', [FaceTolerancePolicyController::class, 'replacement'])->name('face-tolerance-policies.replacement');
+    Route::post('face-tolerance-policies/{face_tolerance_policy}/replacement', [FaceTolerancePolicyController::class, 'replace'])->name('face-tolerance-policies.replace');
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.accounts.manage'])->group(function (): void {
