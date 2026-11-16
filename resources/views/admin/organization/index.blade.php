@@ -46,7 +46,9 @@
                                     </span>
                                     <span class="mt-1 block text-xs font-semibold text-muted">Toleransi {{ $record->late_tolerance_minutes }} menit</span>
                                 @else
-                                    <span class="mt-0.5 block text-xs font-semibold text-muted">{{ $record->code }}</span>
+                                    @if ($resource !== 'leave-categories')
+                                        <span class="mt-0.5 block text-xs font-semibold text-muted">{{ $record->code }}</span>
+                                    @endif
                                     @if ($record->{$noteField})
                                         <span class="mt-1 block font-normal text-muted">{{ Str::limit($record->{$noteField}, 120) }}</span>
                                     @endif

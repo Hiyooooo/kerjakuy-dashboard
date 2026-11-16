@@ -3,12 +3,16 @@
 @php
     $editing = $record->exists;
     $title = ($editing ? 'Edit ' : 'Tambah ').Str::lower($label);
+    $routeFilters = $holidayFilters ?? [];
+    if ($resource === 'holidays') {
+        $title = ($editing ? 'Edit' : 'Tambah').' libur manual';
+    }
 @endphp
 
 @section('title', $title)
 
 @section('content')
-    <a href="{{ route('admin.'.$resource.'.index') }}" class="inline-flex min-h-11 items-center font-bold underline decoration-control/50 underline-offset-4">Kembali ke {{ Str::lower($label) }}</a>
+    <a href="{{ route('admin.'.$resource.'.index', $routeFilters) }}" class="inline-flex min-h-11 items-center font-bold underline decoration-control/50 underline-offset-4">Kembali ke {{ Str::lower($label) }}</a>
     <h1 data-enter class="mt-2 font-heading text-[40px] leading-tight font-extrabold tracking-tight">{{ $title }}</h1>
 
     @if ($resource === 'job-desks' && $positions->isEmpty())
@@ -17,7 +21,7 @@
             <a href="{{ route('admin.positions.create') }}" class="mt-3 inline-flex min-h-11 items-center font-bold underline decoration-control/50 underline-offset-4">Tambah jabatan</a>
         </div>
     @else
-    <form method="POST" action="{{ $editing ? route('admin.'.$resource.'.update', $record) : route('admin.'.$resource.'.store') }}" class="mt-6 grid max-w-xl gap-5 rounded-[22px] border border-line bg-white p-6">
+    <form method="POST" action="{{ $editing ? route('admin.'.$resource.'.update', [$record, ...$routeFilters]) : route('admin.'.$resource.'.store', $routeFilters) }}" class="mt-6 grid max-w-xl gap-5 rounded-[22px] border border-line bg-white p-6">
         @csrf
         @if ($editing)
             @method('PUT')
@@ -28,7 +32,11 @@
         @elseif ($resource === 'attendance-times')
             @include('admin.organization.attendance-time-fields')
         @else
-        @foreach (['code' => ['Kode', 30], 'name' => ['Nama', $nameLimit]] as $field => [$fieldLabel, $limit])
+        @php($textFields = ['name' => ['Nama', $nameLimit]])
+        @if (in_array($resource, ['positions', 'offices'], true))
+            @php($textFields = ['code' => ['Kode', 30]] + $textFields)
+        @endif
+        @foreach ($textFields as $field => [$fieldLabel, $limit])
             <div>
                 <label for="{{ $field }}" class="block text-sm font-bold">{{ $fieldLabel }} {{ Str::lower($label) }}</label>
                 <input id="{{ $field }}" name="{{ $field }}" value="{{ old($field, $record->{$field}) }}" maxlength="{{ $limit }}" required
@@ -39,6 +47,10 @@
                 @enderror
             </div>
         @endforeach
+
+        @if ($resource === 'holidays')
+            @include('admin.organization.holiday-fields')
+        @endif
 
         <div>
             <label for="{{ $noteField }}" class="block text-sm font-bold">{{ $noteLabel }} (opsional)</label>
@@ -71,6 +83,7 @@
         @endif
         @endif
 
+        @if ($resource !== 'holidays')
         <div>
             <label for="is_active" class="block text-sm font-bold">Status</label>
             <select id="is_active" name="is_active" required class="mt-1 min-h-12 w-full rounded-[10px] border border-control px-3"
@@ -82,6 +95,7 @@
                 <p id="is_active-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
             @enderror
         </div>
+        @endif
 
         <button type="submit" class="min-h-12 w-fit cursor-pointer rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">Simpan {{ Str::lower($label) }}</button>
     </form>
@@ -90,10 +104,13 @@
     @if ($editing)
         <details class="mt-4 max-w-xl rounded-[22px] border border-line bg-white px-6 py-2" @if ($errors->has('delete')) open @endif>
             <summary class="min-h-11 cursor-pointer py-3 font-bold text-[#b42318]">Hapus {{ Str::lower($label) }}</summary>
-            <form method="POST" action="{{ route('admin.'.$resource.'.destroy', $record) }}" class="space-y-3 pb-4">
+            <form method="POST" action="{{ route('admin.'.$resource.'.destroy', [$record, ...$routeFilters]) }}" class="space-y-3 pb-4">
                 @csrf
                 @method('DELETE')
                 <p>Hapus {{ $resource === 'job-desks' ? $record->title : $record->name }} secara permanen?</p>
+                @if ($resource === 'holidays')
+                    <p class="text-sm text-muted">{{ $record->holiday_date->locale('id')->translatedFormat('d F Y') }} · {{ $record->office?->name ?? 'Semua kantor' }}</p>
+                @endif
                 @error('delete')
                     <p role="alert" class="text-sm text-[#b42318]">{{ $message }}</p>
                 @enderror

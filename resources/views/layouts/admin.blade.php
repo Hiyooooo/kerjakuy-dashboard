@@ -8,6 +8,7 @@
     <meta name="site-kind" content="software">
     <meta name="description" content="Ruang kerja internal admin dan HR KerjaKuy.">
     <title>@yield('title') | KerjaKuy</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-paper font-sans text-ink">
@@ -19,7 +20,7 @@
         <aside class="border-b border-line bg-white px-[18px] py-4 md:border-r md:border-b-0 md:px-6 md:py-8">
             <div class="flex flex-wrap items-center justify-between gap-3 md:items-start md:gap-8 md:flex-col">
                 <div class="flex items-center gap-3">
-                    <span aria-hidden="true" class="relative grid size-9 shrink-0 place-items-center rounded-[12px] rounded-bl-[4px] bg-coral font-heading text-lg font-extrabold">K</span>
+                    <img src="{{ asset('icon.svg') }}" alt="" width="36" height="36" class="size-9 shrink-0">
                     <div>
                         <span class="block font-heading text-xl font-extrabold tracking-tight">KerjaKuy</span>
                         <span class="block text-xs font-bold text-muted">Ruang kerja HR</span>
@@ -53,7 +54,7 @@
                     @endcan
                     @can('admin.organization.manage')
                         <p class="hidden px-3 text-xs font-extrabold text-muted md:mt-5 md:block">Organisasi</p>
-                        @foreach (['positions' => 'Jabatan', 'offices' => 'Kantor', 'job-desks' => 'Job desk', 'attendance-times' => 'Waktu absen'] as $masterRoute => $masterLabel)
+                        @foreach (['positions' => 'Jabatan', 'offices' => 'Kantor', 'job-desks' => 'Job desk', 'attendance-times' => 'Waktu absen', 'leave-categories' => 'Kategori cuti', 'holidays' => 'Hari libur'] as $masterRoute => $masterLabel)
                             <a href="{{ route('admin.'.$masterRoute.'.index') }}"
                                 @if (request()->routeIs('admin.'.$masterRoute.'.*')) aria-current="page" @endif
                                 class="flex min-h-11 items-center rounded-[10px] px-3 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors md:mt-1">
