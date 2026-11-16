@@ -76,8 +76,8 @@ Untuk instalasi baru, isi `KERJAKUY_ADMIN_EMAIL` dan `KERJAKUY_ADMIN_PASSWORD`, 
 - [x] Buat master waktu absen.
 - [x] Buat kategori cuti.
 - [x] Buat hari libur global dan hari libur per kantor.
-- [ ] Buat alasan di luar lokasi.
-- [ ] Buat metode absen.
+- [x] Buat alasan di luar lokasi.
+- [x] Buat metode absen.
 - [ ] Buat kebijakan toleransi wajah dengan periode berlaku.
 - [ ] Buat lokasi absen dan radius lokasi.
 - [ ] Tunda setting absensi sampai detail field pengaturannya disepakati.

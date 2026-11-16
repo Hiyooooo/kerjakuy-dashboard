@@ -7,6 +7,16 @@
     if ($resource === 'holidays') {
         $title = ($editing ? 'Edit' : 'Tambah').' libur manual';
     }
+    $requiresNote = match (old('requires_note')) {
+        '1', 1, true => true,
+        '0', 0, false => false,
+        default => $record->requires_note ?? true,
+    };
+    $isActive = match (old('is_active')) {
+        '1', 1, true => true,
+        '0', 0, false => false,
+        default => $record->is_active ?? true,
+    };
 @endphp
 
 @section('title', $title)
@@ -37,9 +47,10 @@
             @php($textFields = ['code' => ['Kode', 30]] + $textFields)
         @endif
         @foreach ($textFields as $field => [$fieldLabel, $limit])
+            @php($value = old($field, $record->{$field}))
             <div>
                 <label for="{{ $field }}" class="block text-sm font-bold">{{ $fieldLabel }} {{ Str::lower($label) }}</label>
-                <input id="{{ $field }}" name="{{ $field }}" value="{{ old($field, $record->{$field}) }}" maxlength="{{ $limit }}" required
+                <input id="{{ $field }}" name="{{ $field }}" value="{{ is_string($value) ? $value : '' }}" maxlength="{{ $limit }}" required
                     @error($field) aria-invalid="true" aria-describedby="{{ $field }}-error" @enderror
                     class="mt-1 min-h-12 w-full rounded-[10px] border border-control px-3">
                 @error($field)
@@ -52,6 +63,22 @@
             @include('admin.organization.holiday-fields')
         @endif
 
+        @if ($resource === 'attendance-methods')
+            @include('admin.organization.attendance-method-fields')
+        @elseif ($resource === 'out-of-location-reasons')
+            <div>
+                <label for="requires_note" class="block text-sm font-bold">Catatan pegawai</label>
+                <p id="requires-note-hint" class="mt-1 text-sm text-muted">Tentukan apakah pegawai wajib menulis catatan saat memilih alasan ini.</p>
+                <select id="requires_note" name="requires_note" required class="mt-1 min-h-12 w-full rounded-[10px] border border-control px-3"
+                    aria-describedby="requires-note-hint @error('requires_note') requires-note-error @enderror" @error('requires_note') aria-invalid="true" @enderror>
+                    <option value="1" @selected($requiresNote)>Wajib</option>
+                    <option value="0" @selected(! $requiresNote)>Opsional</option>
+                </select>
+                @error('requires_note')
+                    <p id="requires-note-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
+                @enderror
+            </div>
+        @else
         <div>
             <label for="{{ $noteField }}" class="block text-sm font-bold">{{ $noteLabel }} (opsional)</label>
             <textarea id="{{ $noteField }}" name="{{ $noteField }}" rows="3" maxlength="2000"
@@ -61,6 +88,7 @@
                 <p id="{{ $noteField }}-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
             @enderror
         </div>
+        @endif
 
         @if ($resource === 'offices')
             <fieldset class="grid gap-3">
@@ -88,8 +116,8 @@
             <label for="is_active" class="block text-sm font-bold">Status</label>
             <select id="is_active" name="is_active" required class="mt-1 min-h-12 w-full rounded-[10px] border border-control px-3"
                 @error('is_active') aria-invalid="true" aria-describedby="is_active-error" @enderror>
-                <option value="1" @selected((string) old('is_active', (int) ($record->is_active ?? true)) === '1')>Aktif</option>
-                <option value="0" @selected((string) old('is_active', (int) ($record->is_active ?? true)) === '0')>Nonaktif</option>
+                <option value="1" @selected($isActive)>Aktif</option>
+                <option value="0" @selected(! $isActive)>Nonaktif</option>
             </select>
             @error('is_active')
                 <p id="is_active-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
@@ -101,7 +129,7 @@
     </form>
     @endif
 
-    @if ($editing)
+    @if ($editing && $resource !== 'attendance-methods')
         <details class="mt-4 max-w-xl rounded-[22px] border border-line bg-white px-6 py-2" @if ($errors->has('delete')) open @endif>
             <summary class="min-h-11 cursor-pointer py-3 font-bold text-[#b42318]">Hapus {{ Str::lower($label) }}</summary>
             <form method="POST" action="{{ route('admin.'.$resource.'.destroy', [$record, ...$routeFilters]) }}" class="space-y-3 pb-4">

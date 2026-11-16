@@ -45,6 +45,11 @@
                                         @endif
                                     </span>
                                     <span class="mt-1 block text-xs font-semibold text-muted">Toleransi {{ $record->late_tolerance_minutes }} menit</span>
+                                @elseif ($resource === 'out-of-location-reasons')
+                                    <span class="mt-1 block font-normal text-muted">{{ $record->requires_note ? 'Catatan wajib' : 'Catatan opsional' }}</span>
+                                @elseif ($resource === 'attendance-methods')
+                                    @php($enabledRequirements = array_filter($requirements, fn ($field) => $record->{$field}, ARRAY_FILTER_USE_KEY))
+                                    <span class="mt-1 block font-normal text-muted">{{ $enabledRequirements ? implode(', ', $enabledRequirements) : 'Tanpa syarat tambahan' }}</span>
                                 @else
                                     @if ($resource !== 'leave-categories')
                                         <span class="mt-0.5 block text-xs font-semibold text-muted">{{ $record->code }}</span>

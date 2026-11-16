@@ -3,11 +3,13 @@
 use App\Access\Http\Controllers\Admin\AccountController;
 use App\Access\Http\Controllers\Admin\AuthenticationController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Organization\Http\Controllers\Admin\AttendanceMethodController;
 use App\Organization\Http\Controllers\Admin\AttendanceTimeController;
 use App\Organization\Http\Controllers\Admin\HolidayController;
 use App\Organization\Http\Controllers\Admin\JobDeskController;
 use App\Organization\Http\Controllers\Admin\LeaveCategoryController;
 use App\Organization\Http\Controllers\Admin\OfficeController;
+use App\Organization\Http\Controllers\Admin\OutOfLocationReasonController;
 use App\Organization\Http\Controllers\Admin\PositionController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +33,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.organizat
     Route::resource('leave-categories', LeaveCategoryController::class)->except('show');
     Route::post('holidays/import', [HolidayController::class, 'import'])->middleware('throttle:6,1')->name('holidays.import');
     Route::resource('holidays', HolidayController::class)->except('show');
+    Route::resource('out-of-location-reasons', OutOfLocationReasonController::class)->except('show');
+    Route::resource('attendance-methods', AttendanceMethodController::class)->except(['show', 'destroy']);
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.accounts.manage'])->group(function (): void {
