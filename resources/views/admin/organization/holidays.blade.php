@@ -3,9 +3,12 @@
 @section('title', 'Hari libur')
 
 @section('content')
-    <header data-enter>
-        <h1 class="font-heading text-[40px] leading-tight font-extrabold tracking-tight">Hari libur</h1>
-        <p class="mt-2 max-w-2xl text-muted">Kelola tanggal libur untuk semua kantor atau satu kantor tertentu.</p>
+    <header data-enter class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+            <h1 class="font-heading text-3xl leading-tight font-extrabold tracking-tight sm:text-[40px]">Hari libur</h1>
+            <p class="mt-2 max-w-2xl text-muted">Kelola tanggal libur untuk semua kantor atau satu kantor tertentu.</p>
+        </div>
+        <a href="{{ route('admin.holidays.create', $filters) }}" class="inline-flex min-h-12 items-center rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">Tambah libur manual</a>
     </header>
 
     <section aria-labelledby="holiday-import-heading" class="mt-6 rounded-[22px] border border-line bg-white p-5 sm:p-6">
@@ -22,7 +25,7 @@
                     value="{{ is_scalar($importYear) ? $importYear : '' }}" class="mt-1 min-h-12 w-28 rounded-[10px] border border-control px-3 tabular-nums"
                     @error('year') aria-invalid="true" aria-describedby="holiday-import-error" @enderror>
             </div>
-            <button type="submit" class="min-h-12 cursor-pointer rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 disabled:cursor-wait disabled:opacity-75 motion-safe:transition-colors">Impor libur resmi</button>
+            <button type="submit" class="min-h-12 cursor-pointer rounded-[10px] border border-control bg-white px-4 font-bold hover:bg-paper disabled:cursor-wait disabled:opacity-75 motion-safe:transition-colors">Impor libur resmi</button>
         </form>
         @error('year')
             <p id="holiday-import-error" role="alert" class="mt-2 text-sm text-[#b42318]">{{ $message }}</p>
@@ -68,7 +71,7 @@
     <section aria-labelledby="holiday-list-heading" class="mt-8">
         <h2 id="holiday-list-heading" class="font-heading text-xl font-extrabold">Daftar libur {{ $year }}</h2>
 
-        <form method="GET" action="{{ route('admin.holidays.index') }}" class="mt-4 flex flex-wrap items-end justify-between gap-3">
+        <form method="GET" action="{{ route('admin.holidays.index') }}" aria-label="Filter daftar libur" class="mt-4 flex flex-wrap items-end gap-3">
             <div class="flex w-full min-w-0 items-end gap-3 lg:w-auto">
                 <div>
                     <label for="holiday-filter-year" class="block text-sm font-bold">Tahun</label>
@@ -78,7 +81,7 @@
                 <div class="min-w-0 flex-1 lg:w-52">
                     <label for="holiday-filter-office" class="block text-sm font-bold">Kantor</label>
                     <select id="holiday-filter-office" name="office" class="mt-1 min-h-12 w-full rounded-[10px] border border-control bg-white px-3">
-                        <option value="">Semua kantor</option>
+                        <option value="">Tampilkan semua kantor</option>
                         @foreach ($offices as $office)
                             <option value="{{ $office->id }}" @selected(($filters['office'] ?? null) === $office->id)>
                                 {{ $office->name }} ({{ $office->code }}){{ $office->is_active ? '' : ' · Nonaktif' }}
@@ -87,10 +90,7 @@
                     </select>
                 </div>
             </div>
-            <div class="flex flex-1 flex-wrap items-center justify-between gap-3">
-                <button type="submit" class="min-h-12 cursor-pointer rounded-[10px] border border-control bg-white px-4 font-bold hover:bg-paper">Tampilkan</button>
-                <a href="{{ route('admin.holidays.create', $filters) }}" class="inline-flex min-h-12 items-center rounded-[10px] border border-control bg-white px-4 font-bold hover:bg-paper motion-safe:transition-colors">Tambah libur manual</a>
-            </div>
+            <button type="submit" class="min-h-12 cursor-pointer rounded-[10px] border border-control bg-white px-4 font-bold hover:bg-paper">Terapkan filter</button>
         </form>
         @if (isset($filters['office']))
             <p class="mt-2 text-sm text-muted">Daftar mencakup libur yang berlaku untuk semua kantor dan libur khusus kantor pilihan.</p>

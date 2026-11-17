@@ -9,9 +9,9 @@
     @enderror
 @endif
 
-<fieldset class="grid gap-2">
+<fieldset aria-describedby="attendance-requirements-hint" class="grid gap-2">
     <legend class="mb-1 text-sm font-bold">Syarat absen</legend>
-    <p class="text-sm text-muted">Pilih semua syarat yang wajib dipenuhi pegawai saat absen.</p>
+    <p id="attendance-requirements-hint" class="text-sm text-muted">Pilih syarat yang wajib dipenuhi pegawai saat absen. Jika semua kotak kosong, metode ini tidak mensyaratkan lokasi, verifikasi wajah, atau perangkat terdaftar.</p>
 
     @foreach ($requirements as $field => $requirement)
         <input name="{{ $field }}" type="hidden" value="0">

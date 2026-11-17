@@ -1,5 +1,7 @@
 # 02. Design System KerjaKuy
 
+Identitas visual, warna, dan aksesibilitas berlaku untuk semua tampilan KerjaKuy. Pola hero, demo, dan navigasi publik di bagian 1–6 adalah referensi untuk halaman publik. Untuk panel admin, gunakan pola di bagian 7.
+
 ## 1. Identitas visual
 
 | Sumbu           | Keputusan                                                                                    |
@@ -96,3 +98,28 @@ Gunakan sentence case. Hindari eyebrow kapital di atas setiap judul. Jangan jadi
 - **Nol animasi looping**, parallax, scroll-linked, atau gerak dekorasi terus-menerus.
 - Dengan `prefers-reduced-motion: reduce`, hapus transform/reveal dan tampilkan state akhir tanpa delay.
 - Pastikan fokus terlihat, tab order mengikuti visual, ikon dekoratif `aria-hidden`, semua kontrol punya nama, target sentuh minimal 44×44 px, dan kontras minimum terpenuhi.
+
+## 7. Panel admin KerjaKuy
+
+### Navigasi
+
+Gunakan [layout admin](../resources/views/layouts/admin.blade.php) untuk sidebar, topbar, dan breadcrumb. Logo KerjaKuy berada di area identitas sidebar. Tiap tautan menu memakai ikon 16 px di kiri label. Ikon mengikuti warna teks dan diberi `aria-hidden="true"`. Pertahankan label teks dan tandai halaman aktif dengan latar coral lembut serta `aria-current="page"`.
+
+| Menu | Penempatan halaman |
+| --- | --- |
+| Dashboard | Tautan langsung ke ringkasan kerja HR |
+| Akses pengguna | Tautan langsung ke pengelolaan akun, peran akses, dan status akun |
+| HRD | Data pegawai. Informasi seperti identitas dan riwayat kepegawaian diakses dari profil pegawai. |
+| Master data | Jabatan, Kantor, Job desk, Kategori cuti, dan Hari libur |
+| Absensi | Waktu absen, Alasan di luar lokasi, Metode absen, Toleransi wajah, dan Lokasi absen |
+
+Gunakan grup yang bisa dilipat untuk Master data dan Absensi. Buka grup halaman aktif secara otomatis, termasuk ketika pengguna masuk ke formulir tambah atau edit. Tampilkan tautan hanya jika rutenya tersedia dan pengguna memiliki izin yang sesuai.
+
+### Layout dan formulir
+
+- Gunakan kontainer terpusat dengan lebar maksimum 1600 px di area kerja. Sejajarkan tepi topbar dan konten dengan padding sisi yang sama, yaitu 18 px di ponsel, 32 px mulai tablet, dan 48 px di desktop lebar.
+- Biarkan daftar dan tabel memakai lebar area kerja. Pusatkan formulir dengan lebar maksimum 576 px. Sejajarkan judul dengan tepi panel agar ruang kosong terbagi rata di kiri dan kanan.
+- Formulir sederhana memakai satu kolom. Kontrol yang berpasangan, seperti lintang dan bujur, dapat tampil dua kolom saat ruang cukup dan ditumpuk di layar sempit.
+- Tampilkan label di atas kontrol. Letakkan petunjuk format, satuan, dan pesan validasi di dekat kolom terkait. Gunakan `aria-describedby` untuk menghubungkan petunjuk dan error serta `aria-invalid` untuk input yang gagal divalidasi.
+- Letakkan tindakan utama **Simpan** dan tautan **Batal** di bagian bawah panel. Untuk tindakan khusus, gunakan label sesuai hasilnya, misalnya **Jadwalkan pengganti**. Tempatkan konfirmasi hapus di luar panel simpan.
+- Saat sebuah kontrol bergantung pada isian lain, pertahankan labelnya dan jelaskan cara mengaktifkannya. Contohnya, pilihan **Hari batas absen pulang** baru aktif setelah jam batas diisi.
