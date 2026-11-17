@@ -27,6 +27,16 @@ class Employee extends Model
         return $this->hasMany(EmployeeEmploymentPeriod::class);
     }
 
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(EmployeeJobAssignment::class);
+    }
+
+    public function faceProfiles(): HasMany
+    {
+        return $this->hasMany(EmployeeFaceProfile::class);
+    }
+
     public function editVersion(): string
     {
         return hash('sha256', serialize([$this->getKey(), $this->only($this->getFillable())]));

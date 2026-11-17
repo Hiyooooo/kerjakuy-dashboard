@@ -52,10 +52,16 @@ class EmployeeController extends Controller
 
     public function update(SaveEmployeeRequest $request, Employee $employee): RedirectResponse
     {
+        $creating = ! $employee->exists;
+
         try {
             $this->employees->save($employee, $request->safe()->except('edit_version'), $request->validated('edit_version'));
         } catch (ValidationException $exception) {
             throw $request->forEmployeeForm($exception);
+        }
+
+        if ($creating) {
+            return to_route('admin.employees.edit', $employee)->with('employee_created_id', $employee->getKey());
         }
 
         return to_route('admin.employees.index')->with('employee_status', 'Data pegawai tersimpan.');

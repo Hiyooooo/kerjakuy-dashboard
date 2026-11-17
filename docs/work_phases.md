@@ -89,8 +89,8 @@ Untuk instalasi baru, isi `KERJAKUY_ADMIN_EMAIL` dan `KERJAKUY_ADMIN_PASSWORD`, 
 - [x] Buat data pegawai inti tanpa menyimpan jabatan, kantor, atau status aktif secara ganda pada tabel pegawai.
 - [x] Buat identitas pegawai, termasuk NIK terenkripsi dan hash unik untuk validasi.
 - [x] Buat riwayat periode kepegawaian: jenis hubungan kerja, status, serta tanggal berlaku.
-- [ ] Buat riwayat penempatan pegawai: kantor, jabatan, dan tanggal berlaku.
-- [ ] Buat profil referensi wajah pegawai.
+- [x] Buat riwayat penempatan pegawai: kantor, jabatan, dan tanggal berlaku.
+- [x] Buat profil referensi wajah pegawai.
 - [ ] Terapkan satu profil wajah aktif per pegawai.
 - [ ] Buat halaman data pegawai nonaktif dari riwayat periode kepegawaian.
 - [ ] Hubungkan akun pengguna ke pegawai bila diperlukan.

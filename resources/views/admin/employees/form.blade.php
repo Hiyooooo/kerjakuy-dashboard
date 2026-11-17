@@ -26,7 +26,18 @@
         <nav aria-label="Data pegawai" class="mt-2 flex flex-wrap gap-x-5">
             <a href="{{ route('admin.employees.identity.edit', $employee) }}" class="inline-flex min-h-11 items-center font-bold underline">Identitas pegawai</a>
             <a href="{{ route('admin.employees.periods.index', $employee) }}" class="inline-flex min-h-11 items-center font-bold underline">Riwayat kepegawaian</a>
+            <a href="{{ route('admin.employees.assignments.index', $employee) }}" class="inline-flex min-h-11 items-center font-bold underline">Riwayat penempatan</a>
+            <a href="{{ route('admin.employees.face-profiles.index', $employee) }}" class="inline-flex min-h-11 items-center font-bold underline">Referensi wajah</a>
         </nav>
+        @if (session('employee_created_id') === $employee->getKey())
+            <div class="mt-4 max-w-xl rounded-[10px] border border-line bg-white px-4 py-3">
+                <p role="status" class="font-bold text-[#26734d]">Profil pegawai berhasil dibuat.</p>
+                <p class="mt-1 text-sm text-muted">Lengkapi data sekarang atau kembali nanti.</p>
+                <a href="{{ route('admin.employees.identity.edit', $employee) }}" class="mt-1 inline-flex min-h-11 items-center font-bold underline decoration-control/50 underline-offset-4 hover:decoration-control">Lengkapi identitas</a>
+            </div>
+        @endif
+    @else
+        <p class="mt-2 max-w-xl text-muted">Isi data dasar untuk membuat profil. Setelah disimpan, Anda bisa melengkapi identitas, kepegawaian, penempatan, dan referensi wajah.</p>
     @endif
 
     <form method="POST" action="{{ $editing ? route('admin.employees.update', $employee) : route('admin.employees.store') }}" class="mt-6 grid max-w-xl gap-5 rounded-[22px] border border-line bg-white p-6">
@@ -68,6 +79,6 @@
             </div>
         @endforeach
 
-        <button type="submit" class="min-h-12 w-fit cursor-pointer rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">Simpan pegawai</button>
+        <button type="submit" class="min-h-12 w-fit cursor-pointer rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">{{ $editing ? 'Simpan pegawai' : 'Buat profil pegawai' }}</button>
     </form>
 @endsection

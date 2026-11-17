@@ -4,7 +4,9 @@ use App\Access\Http\Controllers\Admin\AccountController;
 use App\Access\Http\Controllers\Admin\AuthenticationController;
 use App\Employee\Http\Controllers\Admin\EmployeeController;
 use App\Employee\Http\Controllers\Admin\EmployeeEmploymentPeriodController;
+use App\Employee\Http\Controllers\Admin\EmployeeFaceProfileController;
 use App\Employee\Http\Controllers\Admin\EmployeeIdentityController;
+use App\Employee\Http\Controllers\Admin\EmployeeJobAssignmentController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Organization\Http\Controllers\Admin\AttendanceLocationController;
 use App\Organization\Http\Controllers\Admin\AttendanceMethodController;
@@ -58,4 +60,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.employees
     Route::put('employees/{employee}/identity', [EmployeeIdentityController::class, 'update'])->name('employees.identity.update');
     Route::resource('employees.periods', EmployeeEmploymentPeriodController::class)
         ->only(['index', 'create', 'store', 'edit', 'update'])->scoped(['period' => 'id']);
+    Route::resource('employees.assignments', EmployeeJobAssignmentController::class)
+        ->only(['index', 'create', 'store', 'edit', 'update'])->scoped(['assignment' => 'id']);
+    Route::resource('employees.face-profiles', EmployeeFaceProfileController::class)->only(['index', 'store']);
+    Route::get('employees/{employee}/face-profiles/{faceProfile}/photo', [EmployeeFaceProfileController::class, 'photo'])
+        ->scopeBindings()->name('employees.face-profiles.photo');
 });
