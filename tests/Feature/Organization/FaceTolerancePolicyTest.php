@@ -31,7 +31,9 @@ class FaceTolerancePolicyTest extends TestCase
         $this->get(route('admin.face-tolerance-policies.edit', $policy))->assertOk()->assertSee('2027-01-01');
 
         $successor = ['minimum_match_score' => '90.25', 'effective_start_date' => '2027-02-01'];
-        $this->post($store, $successor)->assertSessionHasErrors('effective_start_date');
+        $this->post($store, $successor)->assertSessionHasErrors([
+            'effective_start_date' => 'Periode bertumpang tindih dengan kebijakan yang berlaku mulai 1 Januari 2027 tanpa tanggal akhir. Sesuaikan tanggal pada salah satu kebijakan.',
+        ]);
         $this->put(route('admin.face-tolerance-policies.update', $policy), [
             ...$data,
             'effective_end_date' => '2027-01-31',
@@ -41,7 +43,9 @@ class FaceTolerancePolicyTest extends TestCase
         $this->assertSame($admin->id, $policy->refresh()->created_by_user_id);
 
         $this->post($store, [...$successor, 'effective_start_date' => '2027-01-31'])
-            ->assertSessionHasErrors('effective_start_date');
+            ->assertSessionHasErrors([
+                'effective_start_date' => 'Periode bertumpang tindih dengan kebijakan yang berlaku 1 Januari 2027 sampai 31 Januari 2027. Sesuaikan tanggal pada salah satu kebijakan.',
+            ]);
         $this->post($store, $successor)->assertRedirect($index);
         $this->get($index)->assertOk()->assertSee('Berlaku')->assertSee('Terjadwal')->assertSee('90,25 / 100');
 

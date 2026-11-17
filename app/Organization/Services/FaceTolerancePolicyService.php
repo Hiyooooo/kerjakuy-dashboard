@@ -19,15 +19,10 @@ class FaceTolerancePolicyService
                 }
 
                 $end = $data['effective_end_date'] ?? null;
-                $overlap = FaceTolerancePolicy::query()
-                    ->when($policy->exists, fn ($query) => $query->whereKeyNot($policy))
-                    ->when($end !== null, fn ($query) => $query->whereDate('effective_start_date', '<=', $end))
-                    ->where(fn ($query) => $query->whereNull('effective_end_date')
-                        ->orWhereDate('effective_end_date', '>=', $data['effective_start_date']))
-                    ->exists();
+                $overlap = $this->findOverlap($policy, $data['effective_start_date'], $end);
 
                 if ($overlap) {
-                    throw $this->overlapError();
+                    throw $this->overlapError($overlap);
                 }
 
                 if (! $policy->exists) {
@@ -38,7 +33,7 @@ class FaceTolerancePolicyService
             });
         } catch (QueryException $exception) {
             if ($exception->getCode() === '23P01') {
-                throw $this->overlapError();
+                throw $this->overlapError($this->findOverlap($policy, $data['effective_start_date'], $data['effective_end_date'] ?? null));
             }
 
             throw $exception;
@@ -78,10 +73,30 @@ class FaceTolerancePolicyService
         return $current;
     }
 
-    private function overlapError(): ValidationException
+    private function findOverlap(FaceTolerancePolicy $policy, string $start, ?string $end): ?FaceTolerancePolicy
     {
+        return FaceTolerancePolicy::query()
+            ->when($policy->exists, fn ($query) => $query->whereKeyNot($policy))
+            ->when($end !== null, fn ($query) => $query->whereDate('effective_start_date', '<=', $end))
+            ->where(fn ($query) => $query->whereNull('effective_end_date')
+                ->orWhereDate('effective_end_date', '>=', $start))
+            ->orderBy('effective_start_date')
+            ->first();
+    }
+
+    private function overlapError(?FaceTolerancePolicy $overlap): ValidationException
+    {
+        $message = 'Periode bertumpang tindih dengan kebijakan lain.';
+
+        if ($overlap !== null) {
+            $start = $overlap->effective_start_date->locale('id')->translatedFormat('j F Y');
+            $end = $overlap->effective_end_date?->locale('id')->translatedFormat('j F Y');
+            $period = $end === null ? "mulai $start tanpa tanggal akhir" : "$start sampai $end";
+            $message = "Periode bertumpang tindih dengan kebijakan yang berlaku $period.";
+        }
+
         return ValidationException::withMessages([
-            'effective_start_date' => 'Periode bertumpang tindih dengan kebijakan lain. Sesuaikan tanggal pada salah satu kebijakan.',
+            'effective_start_date' => $message.' Sesuaikan tanggal pada salah satu kebijakan.',
         ]);
     }
 }

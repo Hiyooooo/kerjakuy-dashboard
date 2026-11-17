@@ -16,7 +16,7 @@
     };
     $editVersion = session()->hasOldInput() ? old('edit_version') : $versionedPolicy?->editVersion();
     $fields = [
-        'minimum_match_score' => ['Skor minimum kecocokan', 'number', $policy->minimum_match_score, 'Masukkan skor dari 0 sampai 100. Skor yang sama dengan atau lebih tinggi dari batas ini memenuhi syarat kecocokan.'],
+        'minimum_match_score' => ['Skor minimum kecocokan', 'number', $policy->minimum_match_score, 'Masukkan skor dari 0 sampai 100. Menaikkan skor minimum memperketat verifikasi. Jika batas naik dari 85 ke 90, skor 87 tidak lagi lolos.'],
         'effective_start_date' => ['Berlaku mulai', 'date', $policy->effective_start_date?->toDateString(), null],
         'effective_end_date' => ['Berlaku sampai (opsional)', 'date', $policy->effective_end_date?->toDateString(), 'Tanggal akhir ikut dihitung. Kosongkan jika kebijakan berlaku tanpa batas akhir.'],
     ];
@@ -24,14 +24,24 @@
 
 @section('title', $title)
 
+@section('breadcrumb-parent')
+    <a href="{{ route('admin.face-tolerance-policies.index') }}" class="inline-flex min-h-11 items-center hover:text-ink hover:underline">Toleransi wajah</a>
+@endsection
+
 @section('content')
-    <a href="{{ route('admin.face-tolerance-policies.index') }}" class="inline-flex min-h-11 items-center font-bold underline decoration-control/50 underline-offset-4">Kembali ke toleransi wajah</a>
-    <h1 data-enter class="mt-2 font-heading text-[40px] leading-tight font-extrabold tracking-tight">{{ $title }}</h1>
+    <div class="mx-auto max-w-xl">
+    <h1 data-enter class="font-heading text-3xl leading-tight font-extrabold tracking-tight sm:text-[40px]">{{ $title }}</h1>
 
     @if ($previousPolicy)
         <p class="mt-2 max-w-xl text-muted">Kebijakan yang dimulai {{ $previousPolicy->effective_start_date->locale('id')->translatedFormat('j F Y') }} akan ditutup sehari sebelum penggantinya mulai berlaku.</p>
-    @elseif ($editing && ($policy->effective_end_date === null || $policy->effective_end_date->toDateString() >= today('Asia/Jakarta')->toDateString()))
-        <a href="{{ route('admin.face-tolerance-policies.replacement', $policy) }}" class="mt-2 inline-flex min-h-11 items-center font-bold underline decoration-control/50 underline-offset-4">Jadwalkan pengganti</a>
+    @elseif ($editing)
+        <p class="mt-2 max-w-xl text-muted"><strong>Edit kebijakan</strong> untuk mengoreksi skor atau tanggal pada kebijakan ini.</p>
+        @if ($policy->effective_end_date === null || $policy->effective_end_date->toDateString() >= today('Asia/Jakarta')->toDateString())
+            <div class="mt-1 max-w-xl text-muted">
+                <a href="{{ route('admin.face-tolerance-policies.replacement', $policy) }}" class="inline-flex min-h-11 items-center font-bold text-ink underline decoration-control/50 underline-offset-4">Jadwalkan pengganti</a>
+                <p>Buat kebijakan baru untuk tanggal mendatang. Kebijakan lama berakhir sehari sebelum penggantinya mulai.</p>
+            </div>
+        @endif
     @endif
 
     <form method="POST" action="{{ $action }}" class="mt-6 grid max-w-xl gap-5 rounded-[22px] border border-line bg-white p-6">
@@ -71,6 +81,10 @@
             </div>
         @endforeach
 
-        <button type="submit" class="min-h-12 w-fit cursor-pointer rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">{{ $previousPolicy ? 'Jadwalkan pengganti' : 'Simpan kebijakan' }}</button>
+        <div class="flex flex-wrap gap-2 border-t border-line pt-4">
+            <button type="submit" class="min-h-12 cursor-pointer rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">{{ $previousPolicy ? 'Jadwalkan pengganti' : 'Simpan kebijakan' }}</button>
+            <a href="{{ route('admin.face-tolerance-policies.index') }}" class="inline-flex min-h-12 items-center rounded-[10px] px-4 font-bold hover:bg-paper">Batal</a>
+        </div>
     </form>
+    </div>
 @endsection

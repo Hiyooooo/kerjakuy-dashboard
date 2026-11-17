@@ -27,11 +27,11 @@
                     </div>
                 </div>
 
-                <nav aria-label="Navigasi admin" class="flex w-full flex-wrap items-center gap-1 md:block">
+                <nav aria-label="Navigasi admin" class="w-full space-y-1">
                     <a href="{{ route('admin.dashboard') }}"
                         @if (request()->routeIs('admin.dashboard')) aria-current="page" @endif
-                        class="flex min-h-11 items-center gap-3 rounded-[10px] px-3 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors">
-                        <span aria-hidden="true" class="grid size-3.5 grid-cols-2 grid-rows-2 gap-0.5">
+                        class="flex min-h-11 items-center gap-2 rounded-[10px] px-2 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors md:gap-3 md:px-3">
+                        <span aria-hidden="true" class="grid size-4 shrink-0 grid-cols-2 grid-rows-2 gap-0.5 p-px">
                             <span class="rounded-[2px] bg-current"></span>
                             <span class="rounded-[2px] bg-current"></span>
                             <span class="rounded-[2px] bg-current"></span>
@@ -40,33 +40,66 @@
                         Dashboard
                     </a>
                     @can('admin.accounts.manage')
-                        <p class="hidden px-3 text-xs font-extrabold text-muted md:mt-5 md:block">Akses</p>
-                    @endcan
-                    @can('admin.accounts.manage')
                         <a href="{{ route('admin.accounts.index') }}"
                             @if (request()->routeIs('admin.accounts.*')) aria-current="page" @endif
                             class="flex min-h-11 items-center gap-2 rounded-[10px] px-2 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors md:mt-1 md:gap-3 md:px-3">
                             <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="9" cy="7" r="4"/><path d="M2 21v-2a4 4 0 0 1 4-4h6a4 4 0 0 1 4 4v2m1-18a4 4 0 0 1 0 8m5 10v-2a4 4 0 0 0-3-4"/>
                             </svg>
-                            Pengguna
+                            Akses pengguna
                         </a>
                     @endcan
                     @can('admin.employees.manage')
+                        <p class="mt-4 px-3 text-xs font-extrabold text-muted">HRD</p>
                         <a href="{{ route('admin.employees.index') }}"
                             @if (request()->routeIs('admin.employees.*')) aria-current="page" @endif
-                            class="flex min-h-11 items-center rounded-[10px] px-3 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors md:mt-1">
+                            class="flex min-h-11 items-center gap-2 rounded-[10px] px-2 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors md:mt-1 md:gap-3 md:px-3">
+                            <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="2" y="5" width="20" height="14" rx="2"/>
+                                <circle cx="8" cy="10" r="2"/>
+                                <path d="M5 16a3 3 0 0 1 6 0m3-6h4m-4 4h4"/>
+                            </svg>
                             Data pegawai
                         </a>
                     @endcan
                     @can('admin.organization.manage')
-                        <p class="hidden px-3 text-xs font-extrabold text-muted md:mt-5 md:block">Organisasi</p>
-                        @foreach (['positions' => 'Jabatan', 'offices' => 'Kantor', 'job-desks' => 'Job desk', 'attendance-times' => 'Waktu absen', 'leave-categories' => 'Kategori cuti', 'holidays' => 'Hari libur', 'out-of-location-reasons' => 'Alasan di luar lokasi', 'attendance-methods' => 'Metode absen', 'face-tolerance-policies' => 'Toleransi wajah', 'attendance-locations' => 'Lokasi absen'] as $masterRoute => $masterLabel)
-                            <a href="{{ route('admin.'.$masterRoute.'.index') }}"
-                                @if (request()->routeIs('admin.'.$masterRoute.'.*')) aria-current="page" @endif
-                                class="flex min-h-11 items-center rounded-[10px] px-3 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors md:mt-1">
-                                {{ $masterLabel }}
-                            </a>
+                        @php($menuGroups = [
+                            'Master data' => [
+                            'positions' => ['Jabatan', 'M3 7h18v14H3z M8 7V3h8v4 M3 13h18 M10 13v2h4v-2'],
+                            'offices' => ['Kantor', 'M4 21V4h12v17 M16 10h4v11 M2 21h20 M8 8h4 M8 12h4 M8 16h4'],
+                            'job-desks' => ['Job desk', 'M6 3h9l4 4v14H6z M14 3v5h5 M9 12h7 M9 16h7'],
+                            'leave-categories' => ['Kategori cuti', 'M3 12V4h8l10 10-7 7z M7 8h.01'],
+                            'holidays' => ['Hari libur', 'M3 6h18v15H3z M7 3v6 M17 3v6 M3 11h18 M9 16l2 2 4-4'],
+                            ],
+                            'Absensi' => [
+                            'attendance-times' => ['Waktu absen', 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z M12 7v5l3 2'],
+                            'out-of-location-reasons' => ['Alasan di luar lokasi', 'M21 4H3v13h5v4l5-4h8z M7 9h10 M7 13h6'],
+                            'attendance-methods' => ['Metode absen', 'M4 6h16M4 12h16M4 18h16 M8 4v4 M16 10v4 M10 16v4'],
+                            'face-tolerance-policies' => ['Toleransi wajah', 'M8 3H3v5 M16 3h5v5 M21 16v5h-5 M3 16v5h5 M9 10h.01 M15 10h.01 M9 15q3 3 6 0'],
+                            'attendance-locations' => ['Lokasi absen', 'M20 10c0 5-8 11-8 11s-8-6-8-11a8 8 0 1 1 16 0Z M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'],
+                            ],
+                        ])
+                        @foreach ($menuGroups as $groupLabel => $items)
+                            <details class="group" @if (request()->routeIs(...array_map(fn ($route) => 'admin.'.$route.'.*', array_keys($items)))) open @endif>
+                                <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-[10px] px-3 text-sm font-extrabold hover:bg-paper [&::-webkit-details-marker]:hidden">
+                                    {{ $groupLabel }}
+                                    <svg aria-hidden="true" class="size-4 shrink-0 group-open:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="m9 6 6 6-6 6"/>
+                                    </svg>
+                                </summary>
+                                <div class="ml-3 space-y-1 border-l border-line pl-2">
+                                    @foreach ($items as $route => [$label, $iconPath])
+                                        <a href="{{ route('admin.'.$route.'.index') }}"
+                                            @if (request()->routeIs('admin.'.$route.'.*')) aria-current="page" @endif
+                                            class="flex min-h-11 items-center gap-2 rounded-[10px] px-2 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors">
+                                            <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="{{ $iconPath }}"/>
+                                            </svg>
+                                            {{ $label }}
+                                        </a>
+                                    @endforeach
+                                </div>
+                            </details>
                         @endforeach
                     @endcan
                 </nav>

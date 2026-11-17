@@ -24,12 +24,17 @@
     @enderror
 </div>
 
-@foreach (['job_description' => 'Uraian tugas', 'job_specification' => 'Spesifikasi jabatan'] as $field => $fieldLabel)
+@foreach ([
+    'job_description' => ['Uraian tugas', 'Contoh tanggung jawab: meninjau perubahan kode sebelum rilis.'],
+    'job_specification' => ['Spesifikasi jabatan', 'Contoh kemampuan: menguasai Git dan proses peninjauan kode.'],
+] as $field => [$fieldLabel, $hint])
     <div>
         <label for="{{ $field }}" class="block text-sm font-bold">{{ $fieldLabel }} (opsional)</label>
         <textarea id="{{ $field }}" name="{{ $field }}" rows="4" maxlength="10000"
-            @error($field) aria-invalid="true" aria-describedby="{{ $field }}-error" @enderror
+            aria-describedby="{{ $field }}-hint @error($field) {{ $field }}-error @enderror"
+            @error($field) aria-invalid="true" @enderror
             class="mt-1 w-full rounded-[10px] border border-control px-3 py-2">{{ old($field, $record->{$field}) }}</textarea>
+        <p id="{{ $field }}-hint" class="mt-1 text-sm text-muted">{{ $hint }}</p>
         @error($field)
             <p id="{{ $field }}-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
         @enderror

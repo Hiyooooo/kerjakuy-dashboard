@@ -12,8 +12,10 @@
 <div>
     @php($selectedOffice = old('office_id', $record->office_id))
     <label for="office_id" class="block text-sm font-bold">Kantor (opsional)</label>
+    <p id="attendance-office-hint" class="mt-1 text-sm text-muted">Pilih Tanpa kantor untuk menyimpan lokasi tanpa mengaitkannya ke kantor tertentu.</p>
     <select id="office_id" name="office_id" class="mt-1 min-h-12 w-full rounded-[10px] border border-control px-3"
-        @error('office_id') aria-invalid="true" aria-describedby="office_id-error" @enderror>
+        aria-describedby="attendance-office-hint @error('office_id') office_id-error @enderror"
+        @error('office_id') aria-invalid="true" @enderror>
         <option value="">Tanpa kantor</option>
         @foreach ($offices as $office)
             <option value="{{ $office->id }}" @selected(is_scalar($selectedOffice) && (string) $selectedOffice === (string) $office->id)>
@@ -28,7 +30,7 @@
 
 <fieldset class="grid gap-3">
     <legend class="mb-1 text-sm font-bold">Titik pusat lokasi absen</legend>
-    <p id="attendance-coordinate-hint" class="text-sm text-muted">Salin lintang dan bujur titik absen dari aplikasi peta.</p>
+    <p id="attendance-coordinate-hint" class="text-sm text-muted">Salin koordinat titik absen dari aplikasi peta. Contoh urutan: lintang -6.2, lalu bujur 106.8.</p>
     <div class="grid gap-3 sm:grid-cols-2">
         @foreach (['latitude' => ['Lintang', 90], 'longitude' => ['Bujur', 180]] as $field => [$label, $limit])
             @php($value = old($field, $record->{$field}))
