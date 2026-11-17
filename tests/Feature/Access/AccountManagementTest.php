@@ -21,7 +21,7 @@ class AccountManagementTest extends TestCase
         $this->actingAs($manager)->withoutVite();
 
         $this->get(route('admin.accounts.index'))->assertOk()->assertSee($manager->email);
-        $this->get(route('admin.accounts.create'))->assertOk()->assertSee('Tambah pengguna');
+        $this->get(route('admin.accounts.create'))->assertOk()->assertSee('Tambah akun');
 
         $data = [
             'name' => 'Pengguna Baru',
@@ -76,6 +76,25 @@ class AccountManagementTest extends TestCase
         $this->put($update, [...$data, 'employee_id' => '', 'employee_link_version' => $account->employeeLinkVersion()])
             ->assertRedirectToRoute('admin.accounts.index');
         $this->assertNull($account->refresh()->employee_id);
+    }
+
+    public function test_account_search_filters_before_pagination_and_keeps_the_query(): void
+    {
+        $manager = $this->manager();
+        $this->actingAs($manager)->withoutVite();
+        User::factory()->create(['name' => 'Pencarian Nama Lama']);
+        User::factory()->count(10)->create(['name' => 'Pencarian Nama Baru']);
+        User::factory()->create(['email' => 'alamat-khusus@example.test']);
+        User::factory()->create(['role_id' => $manager->role_id]);
+        $index = route('admin.accounts.index');
+
+        $this->get($index)->assertOk()->assertSee('Akun Super Admin');
+        $this->get(route('admin.accounts.index', ['search' => $manager->email]))->assertOk()->assertSee('Akun Anda');
+        $this->get($index.'?search=pencarian')->assertOk()->assertSee('Pencarian Nama Baru')
+            ->assertDontSee('Pencarian Nama Lama')->assertSee('search=pencarian&amp;page=2', false);
+        $this->get($index.'?search=pencarian&page=2')->assertOk()->assertSee('Pencarian Nama Lama');
+        $this->get($index.'?search=ALAMAT-KHUSUS')->assertOk()
+            ->assertSee('alamat-khusus@example.test')->assertDontSee('Pencarian Nama Baru');
     }
 
     public function test_failed_account_form_only_restores_input_on_its_redirect(): void

@@ -3,6 +3,7 @@
 @php
     $title = $inactive ? 'Pegawai nonaktif' : 'Data pegawai';
     $listingUrl = route($inactive ? 'admin.employees.inactive' : 'admin.employees.index');
+    $searchParams = $search === '' ? [] : ['search' => $search];
 @endphp
 
 @section('title', $title)
@@ -15,9 +16,12 @@
         @endunless
     </div>
 
-    <nav aria-label="Daftar pegawai" class="mt-3 flex flex-wrap gap-x-4">
-        <a href="{{ route('admin.employees.index') }}" @unless ($inactive) aria-current="page" @endunless class="inline-flex min-h-11 items-center font-bold underline aria-[current=page]:text-coral-ink">Semua pegawai</a>
-        <a href="{{ route('admin.employees.inactive') }}" @if ($inactive) aria-current="page" @endif class="inline-flex min-h-11 items-center font-bold underline aria-[current=page]:text-coral-ink">Pegawai nonaktif</a>
+    <nav aria-label="Daftar pegawai" class="mt-3 flex flex-wrap gap-x-2 gap-y-1 border-b border-line">
+        @foreach (['admin.employees.index' => 'Semua pegawai', 'admin.employees.inactive' => 'Nonaktif & mengundurkan diri'] as $routeName => $label)
+            <a href="{{ route($routeName, $searchParams) }}"
+                @if (request()->routeIs($routeName)) aria-current="page" @endif
+                class="inline-flex min-h-11 items-center rounded-t-[10px] border-b-[3px] border-transparent px-2 py-2 text-sm font-semibold text-muted hover:bg-white hover:text-ink aria-[current=page]:border-coral aria-[current=page]:font-extrabold aria-[current=page]:text-ink motion-safe:transition-colors sm:px-3">{{ $label }}</a>
+        @endforeach
     </nav>
     @if ($inactive)
         <p class="mt-1 text-sm text-muted">Menampilkan pegawai dengan status Nonaktif atau Mengundurkan diri pada periode yang berlaku hari ini.</p>
@@ -40,7 +44,13 @@
     @endif
 
     @if ($employees->isEmpty())
-        <p class="mt-6 rounded-[22px] border border-line bg-white p-6 text-muted">{{ $search === '' ? ($inactive ? 'Tidak ada pegawai nonaktif hari ini.' : 'Belum ada pegawai di halaman ini.') : 'Tidak ada pegawai yang cocok dengan pencarian ini.' }}</p>
+        <p class="mt-6 rounded-[22px] border border-line bg-white p-6 text-muted">
+            @if ($inactive)
+                {{ $search === '' ? 'Tidak ada pegawai nonaktif atau mengundurkan diri hari ini.' : 'Tidak ada pegawai nonaktif atau mengundurkan diri yang cocok dengan pencarian ini.' }}
+            @else
+                {{ $search === '' ? 'Belum ada pegawai di halaman ini.' : 'Tidak ada pegawai yang cocok dengan pencarian ini.' }}
+            @endif
+        </p>
     @else
         <div class="mt-6 overflow-hidden rounded-[22px] border border-line bg-white">
             <table class="w-full table-fixed text-left text-sm">
@@ -61,7 +71,7 @@
                                 {{ $employee->full_name }}
                                 <span class="mt-0.5 block font-normal text-muted">{{ $employee->employee_code }}</span>
                                 <span class="mt-2 block text-sm font-normal text-muted">
-                                    {{ $period ? $period::STATUSES[$period->status].' sejak '.$period->effective_start_date->locale('id')->translatedFormat('j F Y') : 'Tidak ada periode kepegawaian berlaku' }}
+                                    {{ $period ? $period::STATUSES[$period->status].' sejak '.$period->effective_start_date->locale('id')->translatedFormat('j F Y') : 'Belum ada periode berlaku' }}
                                 </span>
                                 <span class="mt-0.5 block text-sm font-normal text-muted">
                                     {{ $assignment ? $assignment->position->name.' · '.$assignment->office->name : 'Tidak ada penempatan berlaku' }}

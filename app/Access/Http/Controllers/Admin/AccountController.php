@@ -10,16 +10,24 @@ use App\Access\Services\AccountService;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AccountController extends Controller
 {
     public function __construct(private readonly AccountService $accounts) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        return view('admin.accounts.index', ['accounts' => $this->accounts->paginate()]);
+        $value = $request->query('search');
+        $search = is_string($value) ? Str::substr(trim($value), 0, 150) : '';
+
+        return view('admin.accounts.index', [
+            'accounts' => $this->accounts->paginate(search: $search),
+            'search' => $search,
+        ]);
     }
 
     public function create(): View

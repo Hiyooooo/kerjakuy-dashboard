@@ -137,10 +137,15 @@ class EmployeeTest extends TestCase
             ->assertDontSee('Citra Aktif')->assertDontSee('Doni Mendatang')
             ->assertDontSee('Eka Berakhir')->assertDontSee('Fani Tanpa Periode');
         $this->get(route('admin.employees.inactive', ['search' => 'ayu']))->assertOk()
+            ->assertSee('href="'.route('admin.employees.index', ['search' => 'ayu']).'"', false)
             ->assertSee('Ayu Nonaktif')->assertDontSee('Budi Resign');
+        $this->get(route('admin.employees.index', ['search' => 'Citra']))->assertOk()
+            ->assertSee('href="'.route('admin.employees.inactive', ['search' => 'Citra']).'"', false);
+        $this->get(route('admin.employees.inactive', ['search' => 'Citra']))->assertOk()
+            ->assertSee('Tidak ada pegawai nonaktif atau mengundurkan diri yang cocok dengan pencarian ini.');
         $this->get(route('admin.employees.index'))->assertOk()
             ->assertSee('Aktif sejak 1 Januari 2027')->assertSee('Jabatan Hari Ini · Kantor Hari Ini')
-            ->assertSee('Tidak ada periode kepegawaian berlaku')->assertSee('Tidak ada penempatan berlaku')
+            ->assertSee('Belum ada periode berlaku')->assertSee('Tidak ada penempatan berlaku')
             ->assertDontSee('Jabatan Mendatang');
     }
 

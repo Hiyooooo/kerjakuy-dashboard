@@ -13,10 +13,10 @@
     };
     $errors = $restore ? $errors : new \Illuminate\Support\ViewErrorBag;
 @endphp
-@section('title', $editing ? 'Edit pengguna' : 'Tambah pengguna')
+@section('title', $editing ? 'Edit akun' : 'Tambah akun')
 
 @section('breadcrumb-parent')
-    <a href="{{ route('admin.accounts.index') }}" class="inline-flex min-h-11 items-center hover:text-ink hover:underline">Pengguna</a>
+    <a href="{{ route('admin.accounts.index') }}" class="inline-flex min-h-11 items-center hover:text-ink hover:underline">Akses pengguna</a>
 @endsection
 
 @section('content')
@@ -60,32 +60,38 @@
             </fieldset>
         @endforeach
 
-        <div>
-            <label for="role_id" class="block text-sm font-bold">Role</label>
-            <select id="role_id" name="role_id" required class="mt-1 min-h-12 w-full rounded-[10px] border border-control px-3"
-                @error('role_id') aria-invalid="true" aria-describedby="role-error" @enderror>
-                <option value="">Pilih role</option>
-                @foreach ($roles as $role)
-                    <option value="{{ $role->id }}" @selected((string) $formValue('role_id', $account->role_id) === (string) $role->id)>{{ $role->name }}</option>
-                @endforeach
-            </select>
-            @error('role_id')
-                <p id="role-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
-            @enderror
-        </div>
+        <fieldset class="min-w-0">
+            <legend class="mb-3 font-heading font-extrabold">Peran dan status akses</legend>
+            <div class="grid gap-4">
+                <div>
+                    <label for="role_id" class="block text-sm font-bold">Peran akses</label>
+                    <select id="role_id" name="role_id" required class="mt-1 min-h-12 w-full rounded-[10px] border border-control px-3"
+                        @error('role_id') aria-invalid="true" aria-describedby="role-error" @enderror>
+                        <option value="">Pilih peran</option>
+                        @foreach ($roles as $role)
+                            <option value="{{ $role->id }}" @selected((string) $formValue('role_id', $account->role_id) === (string) $role->id)>{{ $role->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('role_id')
+                        <p id="role-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
+                    @enderror
+                    @include('admin.accounts.role-help')
+                </div>
 
-        <div>
-            <label for="status" class="block text-sm font-bold">Status akun</label>
-            <select id="status" name="status" required class="mt-1 min-h-12 w-full rounded-[10px] border border-[#8b807b] px-3 aria-invalid:border-[#b42318]"
-                @error('status') aria-invalid="true" aria-describedby="status-error" @enderror>
-                @foreach (\App\Access\Models\User::ACCOUNT_STATUSES as $value => $label)
-                    <option value="{{ $value }}" @selected($formValue('status', $account->status ?? 'active') === $value)>{{ $label }}</option>
-                @endforeach
-            </select>
-            @error('status')
-                <p id="status-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
-            @enderror
-        </div>
+                <div>
+                    <label for="status" class="block text-sm font-bold">Status akun</label>
+                    <select id="status" name="status" required class="mt-1 min-h-12 w-full rounded-[10px] border border-[#8b807b] px-3 aria-invalid:border-[#b42318]"
+                        @error('status') aria-invalid="true" aria-describedby="status-error" @enderror>
+                        @foreach (\App\Access\Models\User::ACCOUNT_STATUSES as $value => $label)
+                            <option value="{{ $value }}" @selected($formValue('status', $account->status ?? 'active') === $value)>{{ $label }}</option>
+                        @endforeach
+                    </select>
+                    @error('status')
+                        <p id="status-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
+                    @enderror
+                </div>
+            </div>
+        </fieldset>
 
         <div>
             @php
@@ -118,19 +124,19 @@
         </div>
 
         <div class="flex flex-wrap items-center gap-2 border-t border-line pt-4">
-            <button type="submit" class="min-h-12 cursor-pointer rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">Simpan pengguna</button>
+            <button type="submit" class="min-h-12 cursor-pointer rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">Simpan akun</button>
             <a href="{{ route('admin.accounts.index') }}" class="inline-flex min-h-12 items-center rounded-[10px] px-4 font-bold hover:bg-paper">Batal</a>
         </div>
     </form>
 
     @if ($editing)
         <details class="mx-auto mt-4 max-w-xl rounded-[22px] border border-line bg-white px-6 py-2">
-            <summary class="min-h-11 cursor-pointer py-3 font-bold text-[#b42318]">Hapus pengguna</summary>
+            <summary class="min-h-11 cursor-pointer py-3 font-bold text-[#b42318]">Hapus akun</summary>
             <form method="POST" action="{{ route('admin.accounts.destroy', $account) }}" class="space-y-3 pb-4">
                 @csrf
                 @method('DELETE')
                 <p>Hapus akun {{ $account->email }} secara permanen?</p>
-                <button type="submit" class="min-h-11 cursor-pointer rounded-[10px] border border-[#b42318] px-4 font-bold text-[#b42318] hover:bg-paper">Ya, hapus pengguna</button>
+                <button type="submit" class="min-h-11 cursor-pointer rounded-[10px] border border-[#b42318] px-4 font-bold text-[#b42318] hover:bg-paper">Ya, hapus akun</button>
             </form>
         </details>
     @endif
