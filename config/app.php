@@ -99,6 +99,8 @@ return [
 
     'key' => env('APP_KEY'),
 
+    'employee_nik_hash_key' => env('EMPLOYEE_NIK_HASH_KEY', env('APP_KEY')),
+
     'previous_keys' => [
         ...array_filter(
             explode(',', (string) env('APP_PREVIOUS_KEYS', ''))
