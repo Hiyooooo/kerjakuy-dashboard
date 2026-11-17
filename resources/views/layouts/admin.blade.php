@@ -78,6 +78,10 @@
                             'face-tolerance-policies' => ['Toleransi wajah', 'M8 3H3v5 M16 3h5v5 M21 16v5h-5 M3 16v5h5 M9 10h.01 M15 10h.01 M9 15q3 3 6 0'],
                             'attendance-locations' => ['Lokasi absen', 'M20 10c0 5-8 11-8 11s-8-6-8-11a8 8 0 1 1 16 0Z M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'],
                             ],
+                            'Jadwal kerja' => [
+                            'work-shifts' => ['Shift kerja', 'M12 6v6l4 2 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'],
+                            'work-schedule-templates' => ['Template jadwal mingguan', 'M3 6h18v15H3z M7 3v6 M17 3v6 M3 11h18'],
+                            ],
                         ])
                         @foreach ($menuGroups as $groupLabel => $items)
                             <details class="group" @if (request()->routeIs(...array_map(fn ($route) => 'admin.'.$route.'.*', array_keys($items)))) open @endif>

@@ -99,8 +99,8 @@ Untuk instalasi baru, isi `KERJAKUY_ADMIN_EMAIL` dan `KERJAKUY_ADMIN_PASSWORD`, 
 
 ## Tahap 4 — Jadwal, absensi, perangkat, dan keamanan
 
-- [ ] Buat master shift kerja dari waktu absen.
-- [ ] Buat template jadwal mingguan untuk hari kerja dan hari libur mingguan.
+- [x] Buat master shift kerja dari waktu absen.
+- [x] Buat template jadwal mingguan untuk hari kerja dan hari libur mingguan.
 - [ ] Buat assignment template jadwal default kepada pegawai menurut periode berlaku.
 - [ ] Buat override jadwal harian untuk shift khusus.
 - [ ] Terapkan larangan periode jadwal aktif yang bertumpuk untuk pegawai yang sama.

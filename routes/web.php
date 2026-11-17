@@ -18,7 +18,14 @@ use App\Organization\Http\Controllers\Admin\LeaveCategoryController;
 use App\Organization\Http\Controllers\Admin\OfficeController;
 use App\Organization\Http\Controllers\Admin\OutOfLocationReasonController;
 use App\Organization\Http\Controllers\Admin\PositionController;
+use App\Scheduling\Http\Controllers\Admin\WorkScheduleTemplateController;
+use App\Scheduling\Http\Controllers\Admin\WorkShiftController;
 use Illuminate\Support\Facades\Route;
+
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.scheduling.manage'])->group(function (): void {
+    Route::resource('work-shifts', WorkShiftController::class)->except(['show', 'destroy']);
+    Route::resource('work-schedule-templates', WorkScheduleTemplateController::class)->except(['show', 'destroy']);
+});
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [AuthenticationController::class, 'show'])->name('login');
