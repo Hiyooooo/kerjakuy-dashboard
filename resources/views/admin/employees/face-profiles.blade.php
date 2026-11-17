@@ -10,6 +10,7 @@
     <a href="{{ route('admin.employees.edit', $employee) }}" class="inline-flex min-h-11 items-center font-bold underline">Kembali ke data pegawai</a>
     <h1 data-enter class="mt-2 font-heading text-[40px] leading-tight font-extrabold tracking-tight">Referensi wajah</h1>
     <p class="mt-1 font-bold">{{ $employee->full_name }} · {{ $employee->employee_code }}</p>
+    @include('admin.employees.profile-nav')
     @if (session('employee_status'))
         <p role="status" class="mt-4 text-[#26734d]">{{ session('employee_status') }}</p>
     @endif
@@ -27,7 +28,9 @@
         <div>
             <label for="reference-photo" class="block text-sm font-bold">Foto referensi wajah</label>
             <p id="photo-hint" class="mt-1 text-sm text-muted">Pilih foto JPG atau PNG hingga 5 MB. Gunakan foto dengan wajah pegawai menghadap ke depan dan terlihat jelas.</p>
-            <p id="photo-replacement-hint" class="mt-1 text-sm text-muted">Unggahan baru menjadi profil aktif. Foto sebelumnya tetap bisa dilihat di riwayat.</p>
+            <p id="photo-replacement-hint" class="mt-1 text-sm text-muted">
+                {{ $activeProfileId ? 'Foto aktif akan diganti. Foto sebelumnya tetap tersedia di riwayat.' : 'Foto yang diunggah akan menjadi referensi aktif.' }}
+            </p>
             <input id="reference-photo" name="photo" type="file" accept="image/jpeg,image/png" required
                 aria-describedby="photo-hint photo-replacement-hint @error('photo', route('admin.employees.face-profiles.index', $employee)) photo-error @enderror"
                 @error('photo', route('admin.employees.face-profiles.index', $employee)) aria-invalid="true" @enderror
@@ -36,7 +39,7 @@
                 <p id="photo-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
             @enderror
         </div>
-        <button type="submit" class="min-h-12 w-fit cursor-pointer rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85">Unggah foto</button>
+        @include('admin.employees.form-actions', ['submitLabel' => $activeProfileId ? 'Ganti foto aktif' : 'Unggah foto referensi', 'cancelUrl' => route('admin.employees.edit', $employee)])
     </form>
 
     <h2 class="mt-8 font-heading text-xl font-extrabold">Riwayat unggahan</h2>

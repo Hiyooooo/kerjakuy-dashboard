@@ -23,12 +23,7 @@
     <h1 data-enter class="mt-2 font-heading text-[40px] leading-tight font-extrabold tracking-tight">{{ $title }}</h1>
     @if ($editing)
         <p class="mt-1 font-bold">{{ $employee->full_name }} · {{ $employee->employee_code }}</p>
-        <nav aria-label="Data pegawai" class="mt-2 flex flex-wrap gap-x-5">
-            <a href="{{ route('admin.employees.identity.edit', $employee) }}" class="inline-flex min-h-11 items-center font-bold underline">Identitas pegawai</a>
-            <a href="{{ route('admin.employees.periods.index', $employee) }}" class="inline-flex min-h-11 items-center font-bold underline">Riwayat kepegawaian</a>
-            <a href="{{ route('admin.employees.assignments.index', $employee) }}" class="inline-flex min-h-11 items-center font-bold underline">Riwayat penempatan</a>
-            <a href="{{ route('admin.employees.face-profiles.index', $employee) }}" class="inline-flex min-h-11 items-center font-bold underline">Referensi wajah</a>
-        </nav>
+        @include('admin.employees.profile-nav')
         @if (session('employee_created_id') === $employee->getKey())
             <div class="mt-4 max-w-xl rounded-[10px] border border-line bg-white px-4 py-3">
                 <p role="status" class="font-bold text-[#26734d]">Profil pegawai berhasil dibuat.</p>
@@ -79,6 +74,6 @@
             </div>
         @endforeach
 
-        <button type="submit" class="min-h-12 w-fit cursor-pointer rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">{{ $editing ? 'Simpan pegawai' : 'Buat profil pegawai' }}</button>
+        @include('admin.employees.form-actions', ['submitLabel' => $editing ? 'Simpan pegawai' : 'Buat profil pegawai', 'cancelUrl' => route('admin.employees.index')])
     </form>
 @endsection

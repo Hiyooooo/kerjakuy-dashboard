@@ -10,6 +10,7 @@
     <a href="{{ route('admin.employees.edit', $employee) }}" class="inline-flex min-h-11 items-center font-bold underline">Kembali ke data pegawai</a>
     <h1 data-enter class="mt-2 font-heading text-[40px] leading-tight font-extrabold tracking-tight">Identitas pegawai</h1>
     <p class="mt-1 font-bold">{{ $employee->full_name }} · {{ $employee->employee_code }}</p>
+    @include('admin.employees.profile-nav')
     @if (session('employee_status'))
         <p role="status" class="mt-4 text-[#26734d]">{{ session('employee_status') }}</p>
     @endif
@@ -46,6 +47,6 @@
                 <p id="nik-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
             @enderror
         </div>
-        <button type="submit" class="min-h-12 w-fit rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85">Simpan identitas</button>
+        @include('admin.employees.form-actions', ['submitLabel' => 'Simpan identitas', 'cancelUrl' => route('admin.employees.edit', $employee)])
     </form>
 @endsection

@@ -12,9 +12,18 @@ use Illuminate\Validation\ValidationException;
 
 class AccountService
 {
-    public function paginate(int $perPage = 10): LengthAwarePaginator
+    public function paginate(int $perPage = 10, string $search = ''): LengthAwarePaginator
     {
-        return User::with(['role', 'employee:id,employee_code,full_name'])->orderByDesc('id')->paginate($perPage);
+        $accounts = User::with(['role', 'employee:id,employee_code,full_name'])->orderByDesc('id');
+
+        if ($search !== '') {
+            $pattern = '%'.strtr($search, ['!' => '!!', '%' => '!%', '_' => '!_']).'%';
+            $accounts->where(fn ($query) => $query
+                ->whereRaw("LOWER(name) LIKE LOWER(?) ESCAPE '!'", [$pattern])
+                ->orWhereRaw("LOWER(email) LIKE LOWER(?) ESCAPE '!'", [$pattern]));
+        }
+
+        return $accounts->paginate($perPage)->appends($search !== '' ? ['search' => $search] : []);
     }
 
     /** @return Collection<int, Employee> */

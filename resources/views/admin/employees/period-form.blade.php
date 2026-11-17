@@ -14,6 +14,7 @@
     <a href="{{ route('admin.employees.periods.index', $employee) }}" class="inline-flex min-h-11 items-center font-bold underline">Kembali ke riwayat kepegawaian</a>
     <h1 data-enter class="mt-2 font-heading text-[40px] leading-tight font-extrabold tracking-tight">{{ $title }}</h1>
     <p class="mt-1 font-bold">{{ $employee->full_name }} · {{ $employee->employee_code }}</p>
+    @include('admin.employees.profile-nav')
 
     <form method="POST" action="{{ $editing ? route('admin.employees.periods.update', [$employee, $period]) : route('admin.employees.periods.store', $employee) }}" class="mt-6 grid max-w-xl gap-5 rounded-[22px] border border-line bg-white p-6">
         @csrf
@@ -42,16 +43,18 @@
             </div>
         @endforeach
 
-        @foreach (['effective_start_date' => 'Berlaku mulai', 'effective_end_date' => 'Berlaku sampai (opsional)'] as $field => $label)
+        @foreach (['effective_start_date' => 'Tanggal mulai berlaku', 'effective_end_date' => 'Tanggal akhir berlaku (opsional)'] as $field => $label)
             @php($value = $restore ? old($field, $period->{$field}?->toDateString()) : $period->{$field}?->toDateString())
             <div>
                 <label for="{{ $field }}" class="block text-sm font-bold">{{ $label }}</label>
-                @if ($field === 'effective_end_date')
-                    <p id="period-end-hint" class="mt-1 text-sm text-muted">Tanggal akhir ikut dihitung. Kosongkan jika belum ada tanggal akhir.</p>
+                @if ($field === 'effective_start_date')
+                    <p id="period-start-hint" class="mt-1 text-sm text-muted">Masukkan hari pertama periode berlaku.</p>
+                @else
+                    <p id="period-end-hint" class="mt-1 text-sm text-muted">Periode tetap berlaku pada tanggal akhir. Kosongkan jika belum ada tanggal akhir.</p>
                 @endif
                 <input id="{{ $field }}" name="{{ $field }}" type="date" min="0001-01-01" value="{{ is_string($value) ? $value : '' }}"
                     @required($field === 'effective_start_date')
-                    aria-describedby="{{ $field === 'effective_end_date' ? 'period-end-hint' : '' }} @error($field, $form) {{ $field }}-error @enderror"
+                    aria-describedby="{{ $field === 'effective_end_date' ? 'period-end-hint' : 'period-start-hint' }} @error($field, $form) {{ $field }}-error @enderror"
                     @error($field, $form) aria-invalid="true" @enderror class="mt-1 min-h-12 w-full rounded-[10px] border border-control px-3">
                 @error($field, $form)
                     <p id="{{ $field }}-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
@@ -68,6 +71,6 @@
                 <p id="reason-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
             @enderror
         </div>
-        <button type="submit" class="min-h-12 w-fit rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85">Simpan periode</button>
+        @include('admin.employees.form-actions', ['submitLabel' => 'Simpan periode', 'cancelUrl' => route('admin.employees.periods.index', $employee)])
     </form>
 @endsection

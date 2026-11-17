@@ -1,28 +1,41 @@
 @extends('layouts.admin')
 
-@section('title', 'Pengguna')
+@section('title', 'Akses pengguna')
 
 @section('content')
     <div data-enter class="flex flex-wrap items-center justify-between gap-4">
-        <h1 class="font-heading text-3xl leading-tight font-extrabold tracking-tight sm:text-[40px]">Pengguna</h1>
+        <h1 class="font-heading text-3xl leading-tight font-extrabold tracking-tight sm:text-[40px]">Akses pengguna</h1>
         <a href="{{ route('admin.accounts.create') }}" class="inline-flex min-h-12 items-center gap-2 rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">
             <span aria-hidden="true" class="text-xl leading-none">+</span>
-            Tambah pengguna
+            Tambah akun
         </a>
     </div>
+
+    <form method="GET" action="{{ route('admin.accounts.index') }}" role="search" class="mt-6">
+        <label for="account-search" class="block text-sm font-bold">Cari nama atau email akun</label>
+        <div class="mt-1 flex flex-wrap items-center gap-2">
+            <input id="account-search" name="search" type="search" value="{{ $search }}" maxlength="150"
+                class="min-h-12 w-full min-w-0 rounded-[10px] border border-control bg-white px-3 sm:w-72">
+            <button type="submit" class="min-h-12 cursor-pointer rounded-[10px] border border-control bg-white px-4 font-bold hover:bg-paper">Cari</button>
+            @if ($search !== '')
+                <a href="{{ route('admin.accounts.index') }}" class="inline-flex min-h-11 items-center px-2 font-bold underline">Hapus pencarian</a>
+            @endif
+        </div>
+    </form>
+    @include('admin.accounts.role-help')
 
     @if (session('account_status'))
         <p role="status" class="mt-5 rounded-[10px] border border-line bg-white px-4 py-3 text-[#26734d]">{{ session('account_status') }}</p>
     @endif
 
     @if ($accounts->isEmpty())
-        <p class="mt-6 rounded-[22px] border border-line bg-white p-6 text-muted">Belum ada pengguna di halaman ini.</p>
+        <p class="mt-6 rounded-[22px] border border-line bg-white p-6 text-muted">{{ $search === '' ? 'Belum ada akun di halaman ini.' : 'Tidak ada akun yang cocok dengan pencarian ini.' }}</p>
     @else
-        <div class="mt-6 overflow-x-auto rounded-[22px] border border-line bg-white focus-visible:outline-offset-[-4px]" role="region" aria-label="Daftar pengguna" tabindex="0">
+        <div class="mt-6 overflow-x-auto rounded-[22px] border border-line bg-white focus-visible:outline-offset-[-4px]" role="region" aria-label="Daftar akun" tabindex="0">
             <table class="w-full text-left text-sm">
                 <thead class="border-b border-line bg-paper/60">
                     <tr>
-                        <th scope="col" class="px-3 py-3 sm:px-5">Pengguna</th>
+                        <th scope="col" class="px-3 py-3 sm:px-5">Akun</th>
                         <th scope="col" class="px-2 py-3 sm:px-5">Status</th>
                         <th scope="col" class="px-2 py-3 text-right sm:px-5">Aksi</th>
                     </tr>
@@ -55,7 +68,7 @@
                                 @can('admin.accounts.change', $account)
                                     <a href="{{ route('admin.accounts.edit', $account) }}" aria-label="Edit {{ $account->name }}" class="inline-flex min-h-11 min-w-11 items-center justify-center rounded-[10px] px-2 font-bold underline decoration-control/50 underline-offset-4 hover:bg-coral/15">Edit</a>
                                 @else
-                                    <span class="text-muted">Dilindungi</span>
+                                    <span class="text-muted">{{ auth()->user()->is($account) ? 'Akun Anda' : ($account->isSuperAdmin() ? 'Akun Super Admin' : 'Dilindungi') }}</span>
                                 @endcan
                             </td>
                         </tr>
