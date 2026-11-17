@@ -19,7 +19,10 @@ class EmployeeTest extends TestCase
         $index = route('admin.employees.index');
         $store = route('admin.employees.store');
         $this->get($index)->assertOk()->assertSee('Belum ada pegawai');
-        $this->get(route('admin.employees.create'))->assertOk()->assertSee('Kode pegawai');
+        $this->get(route('admin.employees.create'))->assertOk()
+            ->assertSee('Kode pegawai')
+            ->assertSee('Isi data dasar untuk membuat profil.')
+            ->assertSee('Buat profil pegawai');
 
         $data = [
             'employee_code' => 'pgw-001',
@@ -29,8 +32,13 @@ class EmployeeTest extends TestCase
             'birth_date' => '1995-08-17',
             'address' => 'Alamat privat',
         ];
-        $this->post($store, [...$data, 'position_id' => 1, 'office_id' => 1, 'is_active' => false])->assertRedirect($index);
+        $created = $this->post($store, [...$data, 'position_id' => 1, 'office_id' => 1, 'is_active' => false]);
         $employee = Employee::sole();
+        $edit = route('admin.employees.edit', $employee);
+        $created->assertRedirect($edit);
+        $this->get($edit)->assertOk()
+            ->assertSee('Profil pegawai berhasil dibuat.')
+            ->assertSee('Lengkapi identitas');
         $this->assertSame('PGW-001', $employee->employee_code);
         $this->assertSame('ayu@example.test', $employee->email);
         $this->assertSame('1995-08-17', $employee->birth_date->toDateString());
@@ -39,7 +47,6 @@ class EmployeeTest extends TestCase
             Schema::getColumnListing('employees'),
         );
         $this->get($index)->assertOk()->assertSee('Ayu Pratama')->assertSee('PGW-001')->assertDontSee('Alamat privat');
-        $edit = route('admin.employees.edit', $employee);
         $update = route('admin.employees.update', $employee);
         $version = $employee->editVersion();
         $this->get($edit)->assertOk()->assertSee($version)->assertSee('Alamat privat');
