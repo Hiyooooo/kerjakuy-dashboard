@@ -2,6 +2,9 @@
 
 use App\Access\Http\Controllers\Admin\AccountController;
 use App\Access\Http\Controllers\Admin\AuthenticationController;
+use App\Employee\Http\Controllers\Admin\EmployeeController;
+use App\Employee\Http\Controllers\Admin\EmployeeEmploymentPeriodController;
+use App\Employee\Http\Controllers\Admin\EmployeeIdentityController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Organization\Http\Controllers\Admin\AttendanceLocationController;
 use App\Organization\Http\Controllers\Admin\AttendanceMethodController;
@@ -47,4 +50,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.accounts.
     Route::resource('accounts', AccountController::class)
         ->except('show')
         ->parameters(['accounts' => 'user']);
+});
+
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.employees.manage'])->group(function (): void {
+    Route::resource('employees', EmployeeController::class)->except(['show', 'destroy']);
+    Route::get('employees/{employee}/identity', [EmployeeIdentityController::class, 'edit'])->name('employees.identity.edit');
+    Route::put('employees/{employee}/identity', [EmployeeIdentityController::class, 'update'])->name('employees.identity.update');
+    Route::resource('employees.periods', EmployeeEmploymentPeriodController::class)
+        ->only(['index', 'create', 'store', 'edit', 'update'])->scoped(['period' => 'id']);
 });

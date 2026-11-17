@@ -33,6 +33,21 @@ Database yang sama akan dipakai oleh API untuk aplikasi karyawan pada tahap terp
 - Saldo cuti dihitung dari kuota, carry over, penyesuaian, dan cuti yang disetujui.
 - Data sensitif seperti NIK, NPWP, foto referensi wajah, dan selfie absensi hanya dapat diakses oleh role yang berwenang dan disimpan pada penyimpanan privat.
 
+## Struktur kode per domain
+
+Kelompokkan kode berdasarkan domain, seperti `app/Access` untuk akses akun, `app/Organization` untuk data master organisasi, dan `app/Employee` untuk data pegawai. Ikuti struktur modul yang sudah ada saat menambah fitur.
+
+| Lokasi | Tanggung jawab |
+| --- | --- |
+| `app/<Domain>/Http/Controllers/Admin` | Terima request, panggil service untuk menjalankan alur bisnis, lalu kembalikan view atau redirect. Query sederhana untuk tampilan boleh tetap di controller. |
+| `app/<Domain>/Http/Requests` | Periksa otorisasi, normalisasi input, dan validasi data dari form. |
+| `app/<Domain>/Services` | Tangani alur penyimpanan, transaksi, penguncian, dan aturan bisnis yang melibatkan data tersimpan. Ikuti pola ini meski operasi tulis baru dipakai oleh satu controller. |
+| `app/<Domain>/Models` | Definisikan relasi, cast, dan perilaku yang melekat pada model. |
+| `resources/views/admin/<domain>` | Simpan tampilan Blade admin untuk domain terkait. |
+| `tests/Feature/<Domain>` | Uji alur fitur melalui route dan periksa hasilnya. |
+
+Di modul Pegawai, `EmployeeService`, `EmployeeIdentityService`, dan `EmployeeEmploymentPeriodService` menjadi contoh pola ini. Migrasi tetap di `database/migrations`.
+
 ## Aturan database dan migration
 
 Jangan membuat seluruh tabel ERD sekaligus. Migration dibuat per tahap implementasi dan hanya untuk tabel yang diperlukan fitur pada tahap tersebut.
