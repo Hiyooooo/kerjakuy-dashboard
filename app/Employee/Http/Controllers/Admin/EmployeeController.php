@@ -18,9 +18,32 @@ class EmployeeController extends Controller
 
     public function index(Request $request): View
     {
+        return $this->listing($request, false);
+    }
+
+    public function inactive(Request $request): View
+    {
+        return $this->listing($request, true);
+    }
+
+    private function listing(Request $request, bool $inactive): View
+    {
         $query = $request->query();
         $search = is_string($query['search'] ?? null) ? Str::substr(trim($query['search']), 0, 150) : '';
         $employees = Employee::orderBy('full_name')->orderBy('id');
+
+        $today = today('Asia/Jakarta')->toDateString();
+        $effectiveToday = fn ($query) => $query->whereDate('effective_start_date', '<=', $today)
+            ->where(fn ($query) => $query->whereNull('effective_end_date')
+                ->orWhereDate('effective_end_date', '>=', $today));
+
+        $employees->with(['assignments' => fn ($query) => $effectiveToday($query)->with(['office', 'position'])]);
+
+        if ($inactive) {
+            $employees->withWhereHas('periods', fn ($query) => $effectiveToday($query)->whereIn('status', ['inactive', 'resigned']));
+        } else {
+            $employees->with(['periods' => $effectiveToday]);
+        }
 
         if ($search !== '') {
             $pattern = '%'.strtr($search, ['!' => '!!', '%' => '!%', '_' => '!_']).'%';
@@ -32,6 +55,7 @@ class EmployeeController extends Controller
         return view('admin.employees.index', [
             'employees' => $employees->paginate(15, ['id', 'employee_code', 'full_name'])->appends(['search' => $search]),
             'search' => $search,
+            'inactive' => $inactive,
         ]);
     }
 

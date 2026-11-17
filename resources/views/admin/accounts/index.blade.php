@@ -37,6 +37,7 @@
                                         <span class="wrap-anywhere">{{ $account->name }}</span>
                                         <span class="block font-normal wrap-anywhere text-muted">{{ $account->email }}</span>
                                         <span class="mt-1 block text-xs font-bold text-muted">{{ $account->role->name }}</span>
+                                        <span class="block text-xs font-normal wrap-anywhere text-muted">{{ $account->employee ? $account->employee->full_name.' ('.$account->employee->employee_code.')' : 'Tanpa pegawai' }}</span>
                                     </div>
                                 </div>
                             </th>

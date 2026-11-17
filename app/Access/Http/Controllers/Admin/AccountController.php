@@ -11,6 +11,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 
 class AccountController extends Controller
 {
@@ -28,7 +29,11 @@ class AccountController extends Controller
 
     public function store(StoreAccountRequest $request): RedirectResponse
     {
-        $this->accounts->create($request->validated());
+        try {
+            $this->accounts->create($request->validated());
+        } catch (ValidationException $exception) {
+            throw $request->forAccountForm($exception);
+        }
 
         return to_route('admin.accounts.index')->with('account_status', 'Pengguna berhasil ditambahkan.');
     }
@@ -42,7 +47,11 @@ class AccountController extends Controller
 
     public function update(UpdateAccountRequest $request, User $user): RedirectResponse
     {
-        $this->accounts->update($request->validated(), $user);
+        try {
+            $this->accounts->update($request->safe()->except('employee_link_version'), $user, $request->validated('employee_link_version'));
+        } catch (ValidationException $exception) {
+            throw $request->forAccountForm($exception);
+        }
 
         return to_route('admin.accounts.index')->with('account_status', 'Pengguna berhasil diperbarui.');
     }
@@ -60,6 +69,7 @@ class AccountController extends Controller
         return view('admin.accounts.form', [
             'account' => $account,
             'roles' => Role::whereIn('code', Role::ASSIGNABLE)->orderBy('name')->get(),
+            'employees' => $this->accounts->linkableEmployees($account),
         ]);
     }
 }

@@ -19,6 +19,7 @@ class EmployeeFaceProfileController extends Controller
     {
         return response()->view('admin.employees.face-profiles', [
             'employee' => $employee,
+            'activeProfileId' => $employee->faceProfiles()->whereNull('deactivated_at')->value('id') ?? 0,
             'profiles' => $employee->faceProfiles()->orderByDesc('id')->paginate(15),
         ], 200, ['Cache-Control' => 'private, no-store']);
     }
@@ -26,7 +27,7 @@ class EmployeeFaceProfileController extends Controller
     public function store(StoreFaceProfileRequest $request, Employee $employee, EmployeeFaceProfileService $profiles): RedirectResponse
     {
         try {
-            $profiles->store($employee, $request->validated('photo'), $request->user()->id);
+            $profiles->store($employee, $request->validated('photo'), $request->user()->id, $request->integer('active_profile_id'));
         } catch (ValidationException $exception) {
             throw $request->forForm($exception);
         }

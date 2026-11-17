@@ -55,6 +55,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.accounts.
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.employees.manage'])->group(function (): void {
+    Route::get('employees/inactive', [EmployeeController::class, 'inactive'])->name('employees.inactive');
     Route::resource('employees', EmployeeController::class)->except(['show', 'destroy']);
     Route::get('employees/{employee}/identity', [EmployeeIdentityController::class, 'edit'])->name('employees.identity.edit');
     Route::put('employees/{employee}/identity', [EmployeeIdentityController::class, 'update'])->name('employees.identity.update');

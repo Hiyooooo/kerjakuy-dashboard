@@ -5,6 +5,8 @@ namespace Tests\Feature\Employee;
 use App\Access\Models\Role;
 use App\Access\Models\User;
 use App\Employee\Models\Employee;
+use App\Organization\Models\Office;
+use App\Organization\Models\Position;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
@@ -88,6 +90,58 @@ class EmployeeTest extends TestCase
             ->assertOk()->assertSee('Ayu Pratama')->assertDontSee('Budi Santoso');
         $this->get(route('admin.employees.index', ['search' => '%']))
             ->assertOk()->assertSee('Tidak ada pegawai yang cocok');
+    }
+
+    public function test_inactive_page_only_lists_employees_with_an_effective_inactive_or_resigned_period(): void
+    {
+        $this->travelTo(today('Asia/Jakarta')->setDate(2027, 1, 10));
+        $this->actingAs(User::factory()->for(Role::where('code', 'hrd_admin')->firstOrFail())->create()->refresh())->withoutVite();
+
+        foreach ([
+            ['Ayu Nonaktif', 'inactive', '2027-01-10', '2027-01-10'],
+            ['Budi Resign', 'resigned', '2027-01-01', null],
+            ['Citra Aktif', 'active', '2027-01-01', null],
+            ['Doni Mendatang', 'inactive', '2027-01-11', null],
+            ['Eka Berakhir', 'inactive', '2027-01-01', '2027-01-09'],
+        ] as [$name, $status, $start, $end]) {
+            Employee::factory()->create(['full_name' => $name])->periods()->create([
+                'employment_type' => 'contract',
+                'status' => $status,
+                'effective_start_date' => $start,
+                'effective_end_date' => $end,
+            ]);
+        }
+        Employee::factory()->create(['full_name' => 'Fani Tanpa Periode']);
+        $employee = Employee::where('full_name', 'Ayu Nonaktif')->sole();
+        $office = Office::create(['name' => 'Kantor Hari Ini', 'code' => 'NOW']);
+        $position = Position::create(['name' => 'Jabatan Hari Ini', 'code' => 'NOW']);
+        $assignment = [
+            'office_id' => $office->id,
+            'position_id' => $position->id,
+            'change_type' => 'Penempatan awal',
+            'effective_start_date' => '2027-01-10',
+            'effective_end_date' => '2027-01-10',
+        ];
+        $employee->assignments()->create($assignment);
+        $employee->assignments()->create([
+            ...$assignment,
+            'position_id' => Position::create(['name' => 'Jabatan Mendatang', 'code' => 'FUTURE'])->id,
+            'effective_start_date' => '2027-01-11',
+            'effective_end_date' => null,
+        ]);
+
+        $this->get(route('admin.employees.inactive'))->assertOk()
+            ->assertSee('Ayu Nonaktif')->assertSee('Budi Resign')
+            ->assertSee('Nonaktif sejak 10 Januari 2027')->assertSee('Jabatan Hari Ini · Kantor Hari Ini')
+            ->assertDontSee('Jabatan Mendatang')
+            ->assertDontSee('Citra Aktif')->assertDontSee('Doni Mendatang')
+            ->assertDontSee('Eka Berakhir')->assertDontSee('Fani Tanpa Periode');
+        $this->get(route('admin.employees.inactive', ['search' => 'ayu']))->assertOk()
+            ->assertSee('Ayu Nonaktif')->assertDontSee('Budi Resign');
+        $this->get(route('admin.employees.index'))->assertOk()
+            ->assertSee('Aktif sejak 1 Januari 2027')->assertSee('Jabatan Hari Ini · Kantor Hari Ini')
+            ->assertSee('Tidak ada periode kepegawaian berlaku')->assertSee('Tidak ada penempatan berlaku')
+            ->assertDontSee('Jabatan Mendatang');
     }
 
     public function test_access_is_limited_to_active_hr_and_super_admins(): void

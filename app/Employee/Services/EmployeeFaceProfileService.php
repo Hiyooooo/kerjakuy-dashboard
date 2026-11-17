@@ -5,6 +5,7 @@ namespace App\Employee\Services;
 use App\Employee\Models\Employee;
 use GdImage;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -12,17 +13,30 @@ use Throwable;
 
 class EmployeeFaceProfileService
 {
-    public function store(Employee $employee, UploadedFile $photo, int $actorId): void
+    public function store(Employee $employee, UploadedFile $photo, int $actorId, int $expectedActiveProfileId): void
     {
         [$path, $hash] = $this->storeSanitizedPhoto($photo);
 
         try {
-            $employee->faceProfiles()->create([
-                'reference_photo_path' => $path,
-                'reference_photo_hash' => $hash,
-                'uploaded_by_user_id' => $actorId,
-                'uploaded_at' => now(),
-            ]);
+            DB::transaction(function () use ($employee, $path, $hash, $actorId, $expectedActiveProfileId): void {
+                Employee::query()->lockForUpdate()->findOrFail($employee->getKey());
+                $active = $employee->faceProfiles()->whereNull('deactivated_at');
+
+                if ((int) $active->value('id') !== $expectedActiveProfileId) {
+                    throw ValidationException::withMessages([
+                        'active_profile_id' => 'Profil aktif sudah berubah. Buka versi terbaru sebelum mengunggah kembali.',
+                    ]);
+                }
+
+                $now = now();
+                $active->update(['deactivated_at' => $now]);
+                $employee->faceProfiles()->create([
+                    'reference_photo_path' => $path,
+                    'reference_photo_hash' => $hash,
+                    'uploaded_by_user_id' => $actorId,
+                    'uploaded_at' => $now,
+                ]);
+            });
         } catch (Throwable $exception) {
             Storage::disk('local')->delete($path);
 
