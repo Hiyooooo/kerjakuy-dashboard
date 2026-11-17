@@ -59,9 +59,9 @@ class EmployeeAssignmentAndFaceProfileTest extends TestCase
         $store = route('admin.employees.face-profiles.store', $employee);
 
         $this->get($index)->assertOk()->assertSee('Belum ada foto referensi');
-        $this->post($store, ['photo' => UploadedFile::fake()->create('document.pdf', 10, 'application/pdf')])
+        $this->post($store, ['active_profile_id' => '0', 'photo' => UploadedFile::fake()->create('document.pdf', 10, 'application/pdf')])
             ->assertSessionHasErrors('photo', null, $index);
-        $this->post($store, ['photo' => UploadedFile::fake()->image('reference.png')])->assertRedirect($index);
+        $this->post($store, ['active_profile_id' => '0', 'photo' => UploadedFile::fake()->image('reference.png')])->assertRedirect($index);
         $profile = $employee->faceProfiles()->sole();
         $this->assertSame($admin->id, $profile->uploaded_by_user_id);
         Storage::disk('local')->assertExists($profile->reference_photo_path);
@@ -70,6 +70,16 @@ class EmployeeAssignmentAndFaceProfileTest extends TestCase
         $this->get($index)->assertOk()->assertSee($photo)->assertDontSee($profile->reference_photo_path);
         $this->get($photo)->assertOk()->assertHeader('X-Content-Type-Options', 'nosniff');
         $this->get(route('admin.employees.face-profiles.photo', [$other, $profile]))->assertNotFound();
+        $this->post($store, ['active_profile_id' => (string) $profile->id, 'photo' => UploadedFile::fake()->image('replacement.jpg')])->assertRedirect($index);
+        $this->assertNotNull($profile->refresh()->deactivated_at);
+        $active = $employee->faceProfiles()->whereNull('deactivated_at')->sole();
+        $this->assertNotSame($profile->id, $active->id);
+        $this->post($store, ['active_profile_id' => (string) $profile->id, 'photo' => UploadedFile::fake()->image('stale.png')])
+            ->assertRedirect($index)->assertSessionHasErrors('active_profile_id', null, $index);
+        $this->assertSame($active->id, $employee->faceProfiles()->whereNull('deactivated_at')->sole()->id);
+        $this->assertCount(2, Storage::disk('local')->files('employee-face-profiles'));
+        Storage::disk('local')->assertExists($profile->reference_photo_path);
+        $this->get($photo)->assertOk();
         $this->actingAs(User::factory()->create()->refresh())->get($photo)->assertForbidden();
     }
 
@@ -86,7 +96,7 @@ class EmployeeAssignmentAndFaceProfileTest extends TestCase
             substr($jpeg, 0, 2)."\xFF\xE1".pack('n', strlen($exif) + 2).$exif.substr($jpeg, 2),
         );
 
-        $this->post(route('admin.employees.face-profiles.store', $employee), ['photo' => $photo])
+        $this->post(route('admin.employees.face-profiles.store', $employee), ['active_profile_id' => '0', 'photo' => $photo])
             ->assertRedirectToRoute('admin.employees.face-profiles.index', $employee);
 
         $profile = $employee->faceProfiles()->sole();

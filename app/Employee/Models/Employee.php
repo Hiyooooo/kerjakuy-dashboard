@@ -2,6 +2,7 @@
 
 namespace App\Employee\Models;
 
+use App\Access\Models\User;
 use Database\Factories\EmployeeFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
@@ -16,6 +17,11 @@ class Employee extends Model
 {
     /** @use HasFactory<EmployeeFactory> */
     use HasFactory;
+
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class);
+    }
 
     public function identityDetail(): HasOne
     {

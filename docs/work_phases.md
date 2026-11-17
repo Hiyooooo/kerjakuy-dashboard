@@ -91,9 +91,9 @@ Untuk instalasi baru, isi `KERJAKUY_ADMIN_EMAIL` dan `KERJAKUY_ADMIN_PASSWORD`, 
 - [x] Buat riwayat periode kepegawaian: jenis hubungan kerja, status, serta tanggal berlaku.
 - [x] Buat riwayat penempatan pegawai: kantor, jabatan, dan tanggal berlaku.
 - [x] Buat profil referensi wajah pegawai.
-- [ ] Terapkan satu profil wajah aktif per pegawai.
-- [ ] Buat halaman data pegawai nonaktif dari riwayat periode kepegawaian.
-- [ ] Hubungkan akun pengguna ke pegawai bila diperlukan.
+- [x] Terapkan satu profil wajah aktif per pegawai.
+- [x] Buat halaman data pegawai nonaktif dari riwayat periode kepegawaian.
+- [x] Hubungkan akun pengguna ke pegawai bila diperlukan.
 
 **Selesai jika:** admin dapat melihat pegawai beserta status, kantor, dan jabatan aktif dari riwayat yang tidak tumpang tindih.
 

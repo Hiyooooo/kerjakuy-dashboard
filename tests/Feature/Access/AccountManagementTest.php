@@ -4,6 +4,7 @@ namespace Tests\Feature\Access;
 
 use App\Access\Models\Role;
 use App\Access\Models\User;
+use App\Employee\Models\Employee;
 use Database\Seeders\AdminAccessSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -46,6 +47,53 @@ class AccountManagementTest extends TestCase
 
         $this->delete(route('admin.accounts.destroy', $account))->assertRedirectToRoute('admin.accounts.index');
         $this->assertModelMissing($account);
+    }
+
+    public function test_manager_can_link_and_unlink_an_employee_without_overwriting_a_newer_link(): void
+    {
+        $this->actingAs($this->manager())->withoutVite();
+        $employee = Employee::factory()->create();
+        $account = User::factory()->create()->refresh();
+        $other = User::factory()->create()->refresh();
+        $update = route('admin.accounts.update', $account);
+        $data = $account->only(['name', 'email', 'status', 'role_id']);
+        $initial = $account->employeeLinkVersion();
+
+        $this->get(route('admin.accounts.edit', $account))->assertOk()->assertSee($employee->employee_code)->assertSee($initial);
+        $this->put($update, [...$data, 'employee_id' => $employee->id, 'employee_link_version' => $initial])
+            ->assertRedirectToRoute('admin.accounts.index');
+        $this->assertSame($account->id, $employee->user()->sole()->id);
+        $this->get(route('admin.accounts.index'))->assertOk()->assertSee($employee->employee_code);
+        $this->put(route('admin.accounts.update', $other), [
+            ...$other->only(['name', 'email', 'status', 'role_id']),
+            'employee_id' => $employee->id,
+            'employee_link_version' => $other->employeeLinkVersion(),
+        ])->assertSessionHasErrors('employee_id');
+        $this->put($update, [...$data, 'employee_id' => '', 'employee_link_version' => $initial])
+            ->assertSessionHasErrors('employee_link_version');
+        $this->assertSame($employee->id, $account->refresh()->employee_id);
+
+        $this->put($update, [...$data, 'employee_id' => '', 'employee_link_version' => $account->employeeLinkVersion()])
+            ->assertRedirectToRoute('admin.accounts.index');
+        $this->assertNull($account->refresh()->employee_id);
+    }
+
+    public function test_failed_account_form_only_restores_input_on_its_redirect(): void
+    {
+        $this->actingAs($this->manager())->withoutVite();
+        $employee = Employee::factory()->create();
+        $create = route('admin.accounts.create');
+        $store = route('admin.accounts.store');
+        $data = ['name' => 'Isian dari tab pertama', 'employee_id' => (string) $employee->id];
+
+        $this->post($store, $data)->assertSessionHasErrors('email');
+        $this->get($create)->assertOk()->assertDontSee($data['name'])
+            ->assertDontSee('id="email-error"', false)
+            ->assertDontSee('value="'.$employee->id.'" selected', false);
+
+        $this->followingRedirects()->post($store, $data)->assertOk()->assertSee($data['name'])
+            ->assertSee('id="email-error"', false)
+            ->assertSee('value="'.$employee->id.'" selected', false);
     }
 
     public function test_account_routes_require_permission_and_protect_role_holders(): void

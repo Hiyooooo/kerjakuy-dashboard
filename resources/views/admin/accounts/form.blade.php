@@ -1,6 +1,18 @@
 @extends('layouts.admin')
 
-@php($editing = $account->exists)
+@php
+    $editing = $account->exists;
+    $formToken = request()->query('form');
+    $restore = is_string($formToken)
+        && old('_account_form_token') === $formToken
+        && old('_account_form') === 'account_'.($account->getKey() ?? 'create');
+    $formValue = function (string $field, mixed $default) use ($restore): mixed {
+        $value = $restore ? old($field, $default) : $default;
+
+        return is_scalar($value) ? $value : null;
+    };
+    $errors = $restore ? $errors : new \Illuminate\Support\ViewErrorBag;
+@endphp
 @section('title', $editing ? 'Edit pengguna' : 'Tambah pengguna')
 
 @section('breadcrumb-parent')
@@ -27,7 +39,7 @@
                         <div>
                             <label for="{{ $field }}" class="block text-sm font-bold">{{ $label }}</label>
                             <input id="{{ $field }}" name="{{ $field }}" type="{{ $type }}" autocomplete="{{ $autocomplete }}"
-                                @if ($type !== 'password') value="{{ old($field, $account->{$field}) }}" maxlength="150" @endif
+                                @if ($type !== 'password') value="{{ $formValue($field, $account->{$field}) }}" maxlength="150" @endif
                                 @required(! $editing || $type !== 'password')
                                 @error($field) aria-invalid="true" @enderror
                                 @if ($field === 'password' || $errors->has($field))
@@ -54,7 +66,7 @@
                 @error('role_id') aria-invalid="true" aria-describedby="role-error" @enderror>
                 <option value="">Pilih role</option>
                 @foreach ($roles as $role)
-                    <option value="{{ $role->id }}" @selected((string) old('role_id', $account->role_id) === (string) $role->id)>{{ $role->name }}</option>
+                    <option value="{{ $role->id }}" @selected((string) $formValue('role_id', $account->role_id) === (string) $role->id)>{{ $role->name }}</option>
                 @endforeach
             </select>
             @error('role_id')
@@ -67,11 +79,41 @@
             <select id="status" name="status" required class="mt-1 min-h-12 w-full rounded-[10px] border border-[#8b807b] px-3 aria-invalid:border-[#b42318]"
                 @error('status') aria-invalid="true" aria-describedby="status-error" @enderror>
                 @foreach (\App\Access\Models\User::ACCOUNT_STATUSES as $value => $label)
-                    <option value="{{ $value }}" @selected(old('status', $account->status ?? 'active') === $value)>{{ $label }}</option>
+                    <option value="{{ $value }}" @selected($formValue('status', $account->status ?? 'active') === $value)>{{ $label }}</option>
                 @endforeach
             </select>
             @error('status')
                 <p id="status-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div>
+            @php
+                $selectedEmployee = (string) $formValue('employee_id', $account->employee_id);
+                $employeeLinkVersion = $formValue('employee_link_version', $restore ? null : $account->employeeLinkVersion());
+            @endphp
+            @if ($editing)
+                <input type="hidden" name="employee_link_version" value="{{ $employeeLinkVersion }}">
+            @endif
+            <label for="employee_id" class="block text-sm font-bold">Pegawai terhubung (opsional)</label>
+            <p id="employee-link-hint" class="mt-1 text-sm text-muted">Satu pegawai hanya bisa terhubung ke satu akun. Pilih Tanpa pegawai untuk melepas tautan.</p>
+            <select id="employee_id" name="employee_id" class="mt-1 min-h-12 w-full rounded-[10px] border border-control px-3"
+                aria-describedby="employee-link-hint @error('employee_id') employee-link-error @enderror"
+                @error('employee_id') aria-invalid="true" @enderror>
+                <option value="">Tanpa pegawai</option>
+                @if ($selectedEmployee !== '' && ! $employees->contains(fn ($employee) => (string) $employee->id === $selectedEmployee))
+                    <option value="{{ $selectedEmployee }}" selected>Pegawai yang dipilih tidak tersedia</option>
+                @endif
+                @foreach ($employees as $employee)
+                    <option value="{{ $employee->id }}" @selected($selectedEmployee === (string) $employee->id)>{{ $employee->full_name }} ({{ $employee->employee_code }})</option>
+                @endforeach
+            </select>
+            @error('employee_id')
+                <p id="employee-link-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
+            @enderror
+            @error('employee_link_version')
+                <p role="alert" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>
+                <a href="{{ route('admin.accounts.edit', $account) }}" class="inline-flex min-h-11 items-center font-bold underline">Buka versi terbaru</a>
             @enderror
         </div>
 
