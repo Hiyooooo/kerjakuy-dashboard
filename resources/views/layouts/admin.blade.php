@@ -106,6 +106,16 @@
                             </details>
                         @endforeach
                     @endcan
+                    @can('admin.attendance.manage')
+                        <a href="{{ route('admin.attendance-records.index') }}"
+                            @if (request()->routeIs('admin.attendance-records.*')) aria-current="page" @endif
+                            class="flex min-h-11 items-center gap-2 rounded-[10px] px-2 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 md:px-3">
+                            <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="4" y="4" width="16" height="16" rx="2"/><path d="m8 12 3 3 5-6"/>
+                            </svg>
+                            Catatan absensi
+                        </a>
+                    @endcan
                     @can('admin.devices.manage')
                         <a href="{{ route('admin.registered-devices.index') }}"
                             @if (request()->routeIs('admin.registered-devices.*')) aria-current="page" @endif

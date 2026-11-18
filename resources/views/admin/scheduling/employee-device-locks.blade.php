@@ -20,12 +20,15 @@
 
         @if ($activeLock)
             <p class="mt-2 font-bold">{{ $activeLock->employee->full_name }} · {{ $activeLock->employee->employee_code }}</p>
-            <p id="release-hint" class="mt-1 text-sm text-muted">Lepaskan penguncian sebelum menghubungkan perangkat ke pegawai lain.</p>
-            <form method="POST" action="{{ route('admin.registered-devices.locks.release', [$device, $activeLock]) }}" class="mt-3">
-                @csrf
-                @method('PATCH')
-                <button type="submit" aria-describedby="release-hint" class="min-h-11 rounded-[10px] border border-control px-4 font-bold hover:bg-paper">Lepaskan perangkat</button>
-            </form>
+            <details class="mt-3">
+                <summary class="min-h-11 w-fit cursor-pointer rounded-[10px] border border-control px-4 py-2.5 font-bold hover:bg-paper">Lepaskan perangkat</summary>
+                <form method="POST" action="{{ route('admin.registered-devices.locks.release', [$device, $activeLock]) }}" class="mt-3">
+                    @csrf
+                    @method('PATCH')
+                    <p id="release-hint" class="wrap-anywhere text-sm text-muted">Lepaskan {{ $device->device_name ?: $device->device_uuid }} dari {{ $activeLock->employee->full_name }}?</p>
+                    <button type="submit" aria-describedby="release-hint" class="mt-2 min-h-11 rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85">Konfirmasi pelepasan</button>
+                </form>
+            </details>
         @elseif ($device->status === 'registered')
             <form method="POST" action="{{ route('admin.registered-devices.locks.store', $device) }}" class="mt-4">
                 @csrf
@@ -52,9 +55,9 @@
                 <div class="flex flex-wrap items-start justify-between gap-2 px-4 py-3">
                     <div>
                         <p class="font-bold">{{ $lock->employee->full_name }} · {{ $lock->employee->employee_code }}</p>
-                        <p class="text-sm text-muted">Dikunci {{ $lock->locked_at->setTimezone('Asia/Jakarta')->locale('id')->translatedFormat('j F Y, H:i') }} WIB · {{ $lock->lockedBy?->name ?? 'Akun tidak tersedia' }}</p>
+                        <p class="text-sm text-muted">Dikunci {{ $lock->locked_at->setTimezone('Asia/Jakarta')->locale('id')->translatedFormat('j F Y, H:i') }} WIB · {{ $lock->locked_by_name ?? $lock->lockedBy?->name ?? 'Akun tidak tersedia' }}</p>
                         @if ($lock->released_at)
-                            <p class="text-sm text-muted">Dilepas {{ $lock->released_at->setTimezone('Asia/Jakarta')->locale('id')->translatedFormat('j F Y, H:i') }} WIB · {{ $lock->releasedBy?->name ?? 'Akun tidak tersedia' }}</p>
+                            <p class="text-sm text-muted">Dilepas {{ $lock->released_at->setTimezone('Asia/Jakarta')->locale('id')->translatedFormat('j F Y, H:i') }} WIB · {{ $lock->released_by_name ?? $lock->releasedBy?->name ?? 'Akun tidak tersedia' }}</p>
                         @endif
                     </div>
                     <p class="text-sm font-bold">{{ $lock->released_at ? 'Dilepas' : 'Aktif' }}</p>

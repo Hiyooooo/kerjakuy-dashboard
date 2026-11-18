@@ -107,9 +107,9 @@ Untuk instalasi baru, isi `KERJAKUY_ADMIN_EMAIL` dan `KERJAKUY_ADMIN_PASSWORD`, 
 - [x] Buat registrasi perangkat.
 - [x] Simpan riwayat penguncian dan pelepasan perangkat.
 - [x] Terapkan aturan satu perangkat terkunci aktif per pegawai dan satu pegawai per perangkat aktif.
-- [ ] Buat pencatatan absensi masuk dan pulang dengan snapshot jam jadwal efektif.
-- [ ] Simpan metode, lokasi, perangkat, jarak, keterlambatan, foto selfie, dan alasan di luar lokasi pada absensi.
-- [ ] Buat log verifikasi face recognition, termasuk percobaan gagal sebelum absensi tercipta.
+- [x] Buat pencatatan absensi masuk dan pulang dengan snapshot jam jadwal efektif.
+- [x] Simpan metode, lokasi, perangkat, jarak, keterlambatan, foto selfie, dan alasan di luar lokasi pada absensi.
+- [x] Buat log verifikasi face recognition, termasuk percobaan gagal sebelum absensi tercipta.
 - [ ] Siapkan endpoint API absensi untuk aplikasi karyawan di masa depan.
 
 **Selesai jika:** data absensi dapat ditelusuri kembali ke pegawai, shift efektif, lokasi, perangkat, serta verifikasi wajah.

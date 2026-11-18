@@ -18,12 +18,25 @@ use App\Organization\Http\Controllers\Admin\LeaveCategoryController;
 use App\Organization\Http\Controllers\Admin\OfficeController;
 use App\Organization\Http\Controllers\Admin\OutOfLocationReasonController;
 use App\Organization\Http\Controllers\Admin\PositionController;
+use App\Scheduling\Http\Controllers\Admin\AttendanceRecordController;
 use App\Scheduling\Http\Controllers\Admin\EmployeeDeviceLockController;
 use App\Scheduling\Http\Controllers\Admin\EmployeeScheduleController;
+use App\Scheduling\Http\Controllers\Admin\FaceRecognitionLogController;
 use App\Scheduling\Http\Controllers\Admin\RegisteredDeviceController;
 use App\Scheduling\Http\Controllers\Admin\WorkScheduleTemplateController;
 use App\Scheduling\Http\Controllers\Admin\WorkShiftController;
 use Illuminate\Support\Facades\Route;
+
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.attendance.manage'])->group(function (): void {
+    Route::get('face-verification-logs', [FaceRecognitionLogController::class, 'index'])->name('face-verification-logs.index');
+    Route::get('face-verification-logs/{faceRecognitionLog}/photo', [FaceRecognitionLogController::class, 'photo'])
+        ->middleware('can:admin.attendance.photos.view')->name('face-verification-logs.photo');
+    Route::resource('attendance-records', AttendanceRecordController::class)
+        ->parameters(['attendance-records' => 'attendanceRecord'])->only(['index', 'create', 'store', 'show']);
+    Route::patch('attendance-records/{attendanceRecord}/check-out', [AttendanceRecordController::class, 'checkOut'])->name('attendance-records.checkout');
+    Route::get('attendance-records/{attendanceRecord}/selfie/{event}', [AttendanceRecordController::class, 'photo'])
+        ->whereIn('event', ['masuk', 'pulang'])->middleware('can:admin.attendance.photos.view')->name('attendance-records.photo');
+});
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.devices.manage'])->group(function (): void {
     Route::resource('registered-devices', RegisteredDeviceController::class)->only(['index', 'store']);
