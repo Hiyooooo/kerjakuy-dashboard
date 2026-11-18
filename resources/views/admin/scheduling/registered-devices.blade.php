@@ -54,6 +54,9 @@
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
                         <p class="text-sm font-bold">{{ $device->status === 'blocked' ? 'Diblokir' : 'Terdaftar' }}</p>
+                        <a href="{{ route('admin.registered-devices.locks.index', $device) }}"
+                            aria-label="Penguncian perangkat {{ $device->device_uuid }}"
+                            class="inline-flex min-h-11 items-center px-3 text-sm font-bold underline">Penguncian</a>
                         @if ($device->status === 'registered')
                             <form method="POST" action="{{ route('admin.registered-devices.block', $device) }}">
                                 @csrf
