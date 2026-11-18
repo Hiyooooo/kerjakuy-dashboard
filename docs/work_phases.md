@@ -111,6 +111,9 @@ Untuk instalasi baru, isi `KERJAKUY_ADMIN_EMAIL` dan `KERJAKUY_ADMIN_PASSWORD`, 
 - [x] Simpan metode, lokasi, perangkat, jarak, keterlambatan, foto selfie, dan alasan di luar lokasi pada absensi.
 - [x] Buat log verifikasi face recognition, termasuk percobaan gagal sebelum absensi tercipta.
 - [ ] Siapkan endpoint API absensi untuk aplikasi karyawan di masa depan.
+  - Riwayat dan detail tersedia di `GET /api/v1/attendance` dan `GET /api/v1/attendance/{recordId}` melalui sesi Laravel. Akun harus aktif dan terhubung ke pegawai. Pegawai nonaktif atau resign tetap bisa membaca riwayat sendiri selama akun dan tautannya masih aktif.
+  - Rute `POST /api/v1/attendance/check-in` dan `POST /api/v1/attendance/{recordId}/check-out` masih memakai sesi Laravel dan perlindungan CSRF. Kirim token sesi lewat header `X-CSRF-TOKEN`. Permintaan yang gagal pemeriksaan CSRF mendapat `419`. Setelah lolos autentikasi, otorisasi, dan pembatasan laju, rute mengembalikan `503` tanpa menyimpan data.
+  - Sebelum pengiriman mobile diaktifkan, integrasikan autentikasi mobile, bukti kepemilikan perangkat, dan `Idempotency-Key`. Aplikasi memakai ulang kunci yang sama saat mencoba lagi untuk satu tindakan. Server mengikat kunci ke pegawai dan tindakan, mengembalikan hasil awal untuk permintaan yang sama, serta mengembalikan `409` jika kunci dipakai ulang dengan data berbeda. Simpan kunci dan hasil dalam transaksi yang sama dengan perubahan catatan absensi.
 
 **Selesai jika:** data absensi dapat ditelusuri kembali ke pegawai, shift efektif, lokasi, perangkat, serta verifikasi wajah.
 
