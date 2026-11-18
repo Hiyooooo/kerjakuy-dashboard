@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['employee_id', 'registered_device_id', 'locked_by_user_id', 'locked_at'])]
+#[Fillable(['employee_id', 'registered_device_id', 'locked_by_user_id', 'locked_by_name', 'locked_at'])]
 class EmployeeDeviceLock extends Model
 {
     use HasFactory;

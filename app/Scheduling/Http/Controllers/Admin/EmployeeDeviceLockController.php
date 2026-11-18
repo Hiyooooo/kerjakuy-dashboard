@@ -26,7 +26,7 @@ class EmployeeDeviceLockController extends Controller
     public function store(StoreEmployeeDeviceLockRequest $request, RegisteredDevice $registeredDevice, EmployeeDeviceLockService $service): RedirectResponse
     {
         try {
-            $service->lock($registeredDevice, $request->validated('employee_code'), $request->user()->id);
+            $service->lock($registeredDevice, $request->validated('employee_code'), $request->user());
         } catch (ValidationException $exception) {
             throw $exception->redirectTo(route('admin.registered-devices.locks.index', $registeredDevice));
         }
@@ -36,7 +36,7 @@ class EmployeeDeviceLockController extends Controller
 
     public function release(Request $request, RegisteredDevice $registeredDevice, EmployeeDeviceLock $deviceLock, EmployeeDeviceLockService $service): RedirectResponse
     {
-        $released = $service->release($deviceLock, $request->user()->id);
+        $released = $service->release($deviceLock, $request->user());
 
         return to_route('admin.registered-devices.locks.index', $registeredDevice)
             ->with('device_status', $released ? 'Penguncian perangkat dilepas.' : 'Penguncian ini sudah dilepas.');

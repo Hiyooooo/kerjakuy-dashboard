@@ -98,13 +98,13 @@ class EmployeeScheduleService
         });
     }
 
-    /** @return array{label: string, shift: ?WorkShift} */
+    /** @return array{label: string, shift: ?WorkShift, override_id?: int, override_office_id?: ?int} */
     public function effectiveSchedule(Employee $employee, CarbonImmutable $date): array
     {
         $day = $date->toDateString();
         $override = $employee->shiftOverrides()->whereDate('work_date', $day)->where('status', 'scheduled')->with('shift.attendanceTime')->first();
         if ($override !== null) {
-            return $this->resolveShift('Shift khusus', $override->shift, $date);
+            return [...$this->resolveShift('Shift khusus', $override->shift, $date), 'override_id' => $override->id, 'override_office_id' => $override->office_id];
         }
 
         $assignment = $this->effectiveOn($employee->scheduleAssignments()->getQuery(), $day)
@@ -193,7 +193,7 @@ class EmployeeScheduleService
         return false;
     }
 
-    private function officeOn(Employee $employee, string $date): ?int
+    public function officeOn(Employee $employee, string $date): ?int
     {
         return $this->effectiveOn($employee->assignments()->getQuery(), $date)->value('office_id');
     }
