@@ -105,8 +105,8 @@ Untuk instalasi baru, isi `KERJAKUY_ADMIN_EMAIL` dan `KERJAKUY_ADMIN_PASSWORD`, 
 - [x] Buat override jadwal harian untuk shift khusus.
 - [x] Terapkan larangan periode jadwal aktif yang bertumpuk untuk pegawai yang sama.
 - [x] Buat registrasi perangkat.
-- [ ] Simpan riwayat penguncian dan pelepasan perangkat.
-- [ ] Terapkan aturan satu perangkat terkunci aktif per pegawai dan satu pegawai per perangkat aktif.
+- [x] Simpan riwayat penguncian dan pelepasan perangkat.
+- [x] Terapkan aturan satu perangkat terkunci aktif per pegawai dan satu pegawai per perangkat aktif.
 - [ ] Buat pencatatan absensi masuk dan pulang dengan snapshot jam jadwal efektif.
 - [ ] Simpan metode, lokasi, perangkat, jarak, keterlambatan, foto selfie, dan alasan di luar lokasi pada absensi.
 - [ ] Buat log verifikasi face recognition, termasuk percobaan gagal sebelum absensi tercipta.

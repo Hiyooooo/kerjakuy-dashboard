@@ -18,6 +18,7 @@ use App\Organization\Http\Controllers\Admin\LeaveCategoryController;
 use App\Organization\Http\Controllers\Admin\OfficeController;
 use App\Organization\Http\Controllers\Admin\OutOfLocationReasonController;
 use App\Organization\Http\Controllers\Admin\PositionController;
+use App\Scheduling\Http\Controllers\Admin\EmployeeDeviceLockController;
 use App\Scheduling\Http\Controllers\Admin\EmployeeScheduleController;
 use App\Scheduling\Http\Controllers\Admin\RegisteredDeviceController;
 use App\Scheduling\Http\Controllers\Admin\WorkScheduleTemplateController;
@@ -27,6 +28,12 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.devices.manage'])->group(function (): void {
     Route::resource('registered-devices', RegisteredDeviceController::class)->only(['index', 'store']);
     Route::patch('registered-devices/{registeredDevice}/block', [RegisteredDeviceController::class, 'block'])->name('registered-devices.block');
+    Route::prefix('registered-devices/{registeredDevice}/locks')->name('registered-devices.locks.')->scopeBindings()
+        ->controller(EmployeeDeviceLockController::class)->group(function (): void {
+            Route::get('/', 'index')->name('index');
+            Route::post('/', 'store')->name('store');
+            Route::patch('{deviceLock}/release', 'release')->name('release');
+        });
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.scheduling.manage'])->group(function (): void {
