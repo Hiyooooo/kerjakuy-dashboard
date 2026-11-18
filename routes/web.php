@@ -18,13 +18,31 @@ use App\Organization\Http\Controllers\Admin\LeaveCategoryController;
 use App\Organization\Http\Controllers\Admin\OfficeController;
 use App\Organization\Http\Controllers\Admin\OutOfLocationReasonController;
 use App\Organization\Http\Controllers\Admin\PositionController;
+use App\Scheduling\Http\Controllers\Admin\EmployeeScheduleController;
+use App\Scheduling\Http\Controllers\Admin\RegisteredDeviceController;
 use App\Scheduling\Http\Controllers\Admin\WorkScheduleTemplateController;
 use App\Scheduling\Http\Controllers\Admin\WorkShiftController;
 use Illuminate\Support\Facades\Route;
 
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.devices.manage'])->group(function (): void {
+    Route::resource('registered-devices', RegisteredDeviceController::class)->only(['index', 'store']);
+    Route::patch('registered-devices/{registeredDevice}/block', [RegisteredDeviceController::class, 'block'])->name('registered-devices.block');
+});
+
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.scheduling.manage'])->group(function (): void {
     Route::resource('work-shifts', WorkShiftController::class)->except(['show', 'destroy']);
     Route::resource('work-schedule-templates', WorkScheduleTemplateController::class)->except(['show', 'destroy']);
+    Route::prefix('employees/{employee}')->name('employees.')->scopeBindings()->controller(EmployeeScheduleController::class)->group(function (): void {
+        Route::get('schedules', 'index')->name('schedules.index');
+        Route::get('schedule-assignments/create', 'createDefault')->name('schedule-assignments.create');
+        Route::post('schedule-assignments', 'storeDefault')->name('schedule-assignments.store');
+        Route::get('schedule-assignments/{scheduleAssignment}/edit', 'editDefault')->name('schedule-assignments.edit');
+        Route::put('schedule-assignments/{scheduleAssignment}', 'updateDefault')->name('schedule-assignments.update');
+        Route::get('shift-overrides/create', 'createOverride')->name('shift-overrides.create');
+        Route::post('shift-overrides', 'storeOverride')->name('shift-overrides.store');
+        Route::get('shift-overrides/{shiftOverride}/edit', 'editOverride')->name('shift-overrides.edit');
+        Route::put('shift-overrides/{shiftOverride}', 'updateOverride')->name('shift-overrides.update');
+    });
 });
 
 Route::middleware('guest')->group(function (): void {

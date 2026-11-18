@@ -26,14 +26,13 @@ abstract class SaveSchedulingRequest extends FormRequest
         }
 
         $resource = Str::beforeLast($this->route()->getName(), '.');
-        $record = $this->route('work_shift') ?? $this->route('work_schedule_template');
-        $formRoute = $resource.($record ? '.edit' : '.create');
-        $parameters = $record ? [$record] : [];
+        $formRoute = $resource.($this->routeIs('*.update') ? '.edit' : '.create');
+        $parameters = $this->route()->parameters();
         $token = (string) Str::uuid();
 
         $exception->response = to_route($formRoute, [...$parameters, 'form' => $token])
             ->withInput([
-                ...$this->only(['name', 'code', 'attendance_time_id', 'is_active', 'office_id', 'description', 'days', 'edit_version']),
+                ...$this->only(array_keys($this->rules())),
                 '_scheduling_form' => route($formRoute, $parameters),
                 '_scheduling_token' => $token,
             ])->withErrors($exception->errors());

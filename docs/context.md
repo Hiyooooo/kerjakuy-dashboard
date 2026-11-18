@@ -28,6 +28,7 @@ Database yang sama akan dipakai oleh API untuk aplikasi karyawan pada tahap terp
 - Satu perusahaan dapat memiliki banyak kantor.
 - Satu pegawai dapat memiliki satu akun pengguna; akun admin nonpegawai tidak harus terhubung ke pegawai.
 - Satu pegawai hanya memiliki satu perangkat absensi yang terkunci aktif pada waktu yang sama.
+- Saat API absensi mobile dibuat, UUID digunakan untuk mencari perangkat. Server harus memeriksa status perangkat, penguncian aktif untuk pegawai, dan bukti kepemilikan perangkat seperti tanda tangan tantangan server dengan kunci privat yang disimpan di perangkat.
 - Pegawai memakai template jadwal kerja default. Jadwal harian digunakan untuk override dan tukar shift.
 - Hari libur mingguan diatur melalui template jadwal kerja. Tabel hari libur menyimpan tanggal libur nasional atau khusus.
 - Saldo cuti dihitung dari kuota, carry over, penyesuaian, dan cuti yang disetujui.

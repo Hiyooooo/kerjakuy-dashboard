@@ -101,10 +101,10 @@ Untuk instalasi baru, isi `KERJAKUY_ADMIN_EMAIL` dan `KERJAKUY_ADMIN_PASSWORD`, 
 
 - [x] Buat master shift kerja dari waktu absen.
 - [x] Buat template jadwal mingguan untuk hari kerja dan hari libur mingguan.
-- [ ] Buat assignment template jadwal default kepada pegawai menurut periode berlaku.
-- [ ] Buat override jadwal harian untuk shift khusus.
-- [ ] Terapkan larangan periode jadwal aktif yang bertumpuk untuk pegawai yang sama.
-- [ ] Buat registrasi perangkat.
+- [x] Buat assignment template jadwal default kepada pegawai menurut periode berlaku.
+- [x] Buat override jadwal harian untuk shift khusus.
+- [x] Terapkan larangan periode jadwal aktif yang bertumpuk untuk pegawai yang sama.
+- [x] Buat registrasi perangkat.
 - [ ] Simpan riwayat penguncian dan pelepasan perangkat.
 - [ ] Terapkan aturan satu perangkat terkunci aktif per pegawai dan satu pegawai per perangkat aktif.
 - [ ] Buat pencatatan absensi masuk dan pulang dengan snapshot jam jadwal efektif.

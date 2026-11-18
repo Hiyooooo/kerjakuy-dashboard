@@ -106,6 +106,16 @@
                             </details>
                         @endforeach
                     @endcan
+                    @can('admin.devices.manage')
+                        <a href="{{ route('admin.registered-devices.index') }}"
+                            @if (request()->routeIs('admin.registered-devices.*')) aria-current="page" @endif
+                            class="flex min-h-11 items-center gap-2 rounded-[10px] px-2 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors md:mt-1 md:gap-3 md:px-3">
+                            <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                                <rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/>
+                            </svg>
+                            Perangkat absensi
+                        </a>
+                    @endcan
                 </nav>
             </div>
         </aside>

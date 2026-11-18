@@ -28,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('admin.organization.manage', fn (User $user): bool => $user->status === 'active'
             && in_array($user->role?->code, ['super_admin', 'hrd_admin'], true));
         Gate::define('admin.scheduling.manage', fn (User $user): bool => $user->can('admin.organization.manage'));
+        Gate::define('admin.devices.manage', fn (User $user): bool => $user->status === 'active'
+            && in_array($user->role?->code, ['super_admin', 'hrd_admin', 'attendance_admin'], true));
         Gate::define('admin.employees.manage', fn (User $user): bool => $user->status === 'active'
             && in_array($user->role?->code, ['super_admin', 'hrd_admin'], true));
         Gate::define('admin.accounts.change', fn (User $actor, User $account): bool => ! $actor->is($account)
