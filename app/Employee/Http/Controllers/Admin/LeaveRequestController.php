@@ -2,6 +2,7 @@
 
 namespace App\Employee\Http\Controllers\Admin;
 
+use App\Employee\Http\Requests\StoreLeaveBalanceAdjustmentRequest;
 use App\Employee\Http\Requests\StoreLeaveRequest;
 use App\Employee\Models\Employee;
 use App\Employee\Models\EmployeeRequest;
@@ -9,11 +10,14 @@ use App\Employee\Services\LeaveRequestService;
 use App\Http\Controllers\Controller;
 use App\Organization\Models\LeaveCategory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class LeaveRequestController extends Controller
@@ -58,6 +62,47 @@ class LeaveRequestController extends Controller
             ->orderBy('full_name')->orderBy('id')->limit(20)->get(['id', 'full_name', 'employee_code']);
 
         return response()->json(['data' => $employees]);
+    }
+
+    public function balancePage(Request $request, LeaveRequestService $service): View
+    {
+        $filters = $request->validate([
+            'employee_code' => ['required_with:leave_category_id,year', 'nullable', 'string', 'max:30'],
+            'leave_category_id' => ['required_with:employee_code,year', 'nullable', 'integer', 'exists:leave_categories,id'],
+            'year' => ['required_with:employee_code,leave_category_id', 'nullable', 'integer', 'between:1,9999'],
+        ]);
+        $employee = null;
+        $balance = null;
+        if (isset($filters['employee_code'])) {
+            $employee = Employee::where('employee_code', Str::upper($filters['employee_code']))->first(['id', 'full_name', 'employee_code']);
+            if ($employee === null) {
+                throw ValidationException::withMessages(['employee_code' => 'Kode pegawai tidak ditemukan.'])
+                    ->redirectTo(route('admin.leave-requests.balances'));
+            }
+            $year = (int) $filters['year'];
+            $balance = $service->balances($employee->id, (int) $filters['leave_category_id'], [$year])->get($year);
+        }
+        $categories = LeaveCategory::orderBy('name')->get(['id', 'name']);
+
+        return view('admin.employees.leave-requests.balances', compact('filters', 'categories', 'employee', 'balance'));
+    }
+
+    public function storeAdjustment(StoreLeaveBalanceAdjustmentRequest $request, LeaveRequestService $service): RedirectResponse
+    {
+        $data = $request->validated();
+        $employee = Employee::query()->findOrFail($data['employee_id'], ['employee_code']);
+        $balanceUrl = route('admin.leave-requests.balances', [
+            'employee_code' => $employee->employee_code,
+            'leave_category_id' => $data['leave_category_id'],
+            'year' => $data['year'],
+        ]);
+        try {
+            $service->adjust($data, $request->user()->id);
+        } catch (ValidationException $exception) {
+            throw $exception->redirectTo($balanceUrl);
+        }
+
+        return redirect()->to($balanceUrl)->with('leave_status', 'Penyesuaian saldo tersimpan.');
     }
 
     public function balance(Request $request, LeaveRequestService $service): JsonResponse
@@ -122,6 +167,7 @@ class LeaveRequestController extends Controller
     {
         abort_unless($leaveRequest->request_type === 'leave', 404);
         $path = DB::table('leave_request_details')->where('request_id', $leaveRequest->id)->value('attachment_path');
+        /** @var FilesystemAdapter $disk */
         $disk = Storage::disk('local');
         abort_unless($path && $disk->exists($path), 404);
 

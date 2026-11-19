@@ -14,6 +14,31 @@ use Throwable;
 
 class LeaveRequestService
 {
+    public function adjust(array $data, int $actorId): void
+    {
+        DB::transaction(function () use ($data, $actorId): void {
+            Employee::query()->lockForUpdate()->findOrFail($data['employee_id']);
+            $entitlement = DB::table('employee_leave_entitlements')
+                ->where('employee_id', $data['employee_id'])
+                ->where('leave_category_id', $data['leave_category_id'])
+                ->where('entitlement_year', $data['year'])
+                ->lockForUpdate()->first(['id']);
+            if ($entitlement === null) {
+                throw ValidationException::withMessages(['adjustment_days' => 'Jatah untuk kategori dan tahun ini belum tersedia.']);
+            }
+
+            $now = now();
+            DB::table('leave_balance_adjustments')->insert([
+                'employee_leave_entitlement_id' => $entitlement->id,
+                'adjustment_days' => $data['adjustment_days'],
+                'reason' => $data['reason'],
+                'adjusted_by_user_id' => $actorId,
+                'adjusted_at' => $now,
+                'created_at' => $now,
+            ]);
+        });
+    }
+
     public function grant(array $data): void
     {
         DB::transaction(function () use ($data): void {
