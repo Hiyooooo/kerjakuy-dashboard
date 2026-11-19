@@ -133,6 +133,47 @@ class LeaveRequestService
         }
     }
 
+    public function validateApprovalBalance(EmployeeRequest $record, int $categoryId): void
+    {
+        Employee::query()->lockForUpdate()->findOrFail($record->employee_id);
+        $days = DB::table('leave_request_days')->where('leave_request_detail_id', $record->id)
+            ->get(['employee_leave_entitlement_id', 'leave_date', 'duration_days']);
+        if ($days->isEmpty()) {
+            throw ValidationException::withMessages(['approval' => 'Tanggal cuti belum tersedia.']);
+        }
+
+        $ids = $days->pluck('employee_leave_entitlement_id')->unique();
+        DB::table('employee_leave_entitlements')->where('employee_id', $record->employee_id)
+            ->whereIn('id', $ids)->orderBy('id')->lockForUpdate()->get(['id']);
+
+        $years = $days->map(fn (object $day): int => (int) substr($day->leave_date, 0, 4))->unique();
+        $balances = $this->balances($record->employee_id, $categoryId, $years->all());
+        $approvedByDate = DB::table('leave_request_days as days')
+            ->join('requests', 'requests.id', '=', 'days.leave_request_detail_id')
+            ->where('requests.employee_id', $record->employee_id)
+            ->where('requests.request_type', 'leave')->where('requests.status', 'approved')
+            ->whereIn('days.leave_date', $days->pluck('leave_date'))
+            ->groupBy('days.leave_date')->selectRaw('days.leave_date, SUM(days.duration_days) as total')
+            ->pluck('total', 'leave_date');
+        $requested = [];
+        foreach ($days as $day) {
+            $year = (int) substr($day->leave_date, 0, 4);
+            $balance = $balances->get($year);
+            if ($balance === null || (int) $balance->id !== (int) $day->employee_leave_entitlement_id) {
+                throw ValidationException::withMessages(['approval' => "Jatah cuti tahun {$year} tidak sesuai dengan permohonan."]);
+            }
+            $durationCents = (int) round($day->duration_days * 100);
+            $requested[$year] = ($requested[$year] ?? 0) + $durationCents;
+            $approvedCents = (int) round(($approvedByDate->get($day->leave_date) ?? 0) * 100);
+            if ($approvedCents + $durationCents > 100) {
+                throw ValidationException::withMessages(['approval' => "Total cuti pada {$day->leave_date} melebihi satu hari."]);
+            }
+            if ($requested[$year] > $balance->available_cents) {
+                throw ValidationException::withMessages(['approval' => "Saldo cuti tahun {$year} tidak mencukupi."]);
+            }
+        }
+    }
+
     /** @param array<int, int> $years */
     public function balances(int $employeeId, int $categoryId, array $years): Collection
     {

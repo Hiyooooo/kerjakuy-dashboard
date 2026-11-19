@@ -71,6 +71,7 @@
                                 'late-requests' => ['Permohonan terlambat', 'M12 7v5l3 2 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'],
                                 'overtime-requests' => ['Permohonan lembur', 'M12 8v4l3 2 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'],
                                 'shift-swap-requests' => ['Permohonan tukar shift', 'M4 7h16l-4-4 M20 17H4l4 4'],
+                                'request-approvals' => ['Persetujuan permohonan', 'M5 4h14v16H5z M8 12l3 3 5-6'],
                             ];
                         }
                         if ($user->can('admin.organization.manage')) {

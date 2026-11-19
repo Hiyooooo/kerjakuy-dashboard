@@ -9,6 +9,7 @@ use App\Employee\Http\Controllers\Admin\EmployeeIdentityController;
 use App\Employee\Http\Controllers\Admin\EmployeeJobAssignmentController;
 use App\Employee\Http\Controllers\Admin\LateRequestController;
 use App\Employee\Http\Controllers\Admin\LeaveRequestController;
+use App\Employee\Http\Controllers\Admin\RequestApprovalController;
 use App\Employee\Http\Controllers\Admin\ShiftRequestController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Organization\Http\Controllers\Admin\AttendanceLocationController;
@@ -104,6 +105,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.accounts.
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.employees.manage'])->group(function (): void {
+    Route::get('request-approvals', [RequestApprovalController::class, 'index'])->name('request-approvals.index');
+    Route::post('request-approvals/{record}', [RequestApprovalController::class, 'decide'])
+        ->whereNumber('record')->name('request-approvals.decide');
     foreach (['overtime-requests', 'shift-swap-requests'] as $prefix) {
         Route::prefix($prefix)->name($prefix.'.')->controller(ShiftRequestController::class)->group(function (): void {
             Route::get('/', 'index')->name('index');

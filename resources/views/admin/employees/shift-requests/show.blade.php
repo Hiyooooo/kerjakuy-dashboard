@@ -38,7 +38,7 @@
             <p class="mt-3 wrap-anywhere whitespace-pre-wrap text-muted">{{ $detail->reason }}</p>
         @endif
         @if ($record->reviewed_at)
-            <p class="mt-3 text-sm font-bold">{{ $record->reviewer?->name ?? 'Akun peninjau tidak tersedia' }} · {{ $record->reviewed_at->setTimezone('Asia/Jakarta')->locale('id')->translatedFormat('j F Y, H:i') }} WIB</p>
+            <p class="mt-3 text-sm font-bold">{{ $record->reviewed_by_name ?? $record->reviewer?->name ?? 'Akun peninjau tidak tersedia' }} · {{ $record->reviewed_at->setTimezone('Asia/Jakarta')->locale('id')->translatedFormat('j F Y, H:i') }} WIB</p>
             @if ($record->reviewer_note)
                 <p class="mt-1 wrap-anywhere whitespace-pre-wrap text-muted">{{ $record->reviewer_note }}</p>
             @endif

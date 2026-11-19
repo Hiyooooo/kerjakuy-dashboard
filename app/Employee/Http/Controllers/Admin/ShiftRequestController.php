@@ -63,7 +63,7 @@ class ShiftRequestController extends Controller
     {
         $data = $request->validate(['reviewer_note' => ['nullable', 'string', 'max:2000']]);
         try {
-            $service->approveSwap($record, $request->user()->id, $data['reviewer_note'] ?? null);
+            $service->approveSwap($record, $request->user(), $data['reviewer_note'] ?? null);
         } catch (ValidationException $exception) {
             throw $exception->redirectTo(route('admin.shift-swap-requests.show', $record));
         }
