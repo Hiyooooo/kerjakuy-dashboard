@@ -7,7 +7,9 @@ use App\Scheduling\Models\EmployeeShiftSchedule;
 use App\Scheduling\Models\EmployeeWorkScheduleAssignment;
 use Database\Factories\EmployeeFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,6 +19,15 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[UseFactory(EmployeeFactory::class)]
 class Employee extends Model
 {
+    #[Scope]
+    protected function matchingSearch(Builder $query, string $search): void
+    {
+        $pattern = '%'.strtr($search, ['!' => '!!', '%' => '!%', '_' => '!_']).'%';
+        $query->where(fn (Builder $match) => $match
+            ->whereRaw("LOWER(full_name) LIKE LOWER(?) ESCAPE '!'", [$pattern])
+            ->orWhereRaw("LOWER(employee_code) LIKE LOWER(?) ESCAPE '!'", [$pattern]));
+    }
+
     /** @use HasFactory<EmployeeFactory> */
     use HasFactory;
 

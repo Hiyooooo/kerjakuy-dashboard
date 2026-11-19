@@ -2,8 +2,11 @@
 
 @section('title', 'Penguncian perangkat')
 
+@section('breadcrumb-parent')
+    <a href="{{ route('admin.registered-devices.index') }}" class="inline-flex min-h-11 items-center hover:underline">Perangkat absensi</a>
+@endsection
+
 @section('content')
-    <a href="{{ route('admin.registered-devices.index') }}" class="inline-flex min-h-11 items-center font-bold underline">Kembali ke perangkat absensi</a>
     <h1 data-enter class="mt-2 font-heading text-[40px] leading-tight font-extrabold tracking-tight">Penguncian perangkat</h1>
     <p class="mt-1 font-bold">{{ $device->device_name ?? 'Perangkat tanpa nama' }}</p>
     <p class="wrap-anywhere text-sm text-muted">{{ $device->device_uuid }}</p>
@@ -30,8 +33,10 @@
                 </form>
             </details>
         @elseif ($device->status === 'registered')
-            <form method="POST" action="{{ route('admin.registered-devices.locks.store', $device) }}" class="mt-4">
+            <form method="POST" action="{{ route('admin.registered-devices.locks.store', $device) }}" class="mt-4" data-employee-picker="{{ route('admin.registered-devices.locks.employees', $device) }}">
                 @csrf
+                <p class="mb-2 text-sm text-muted">Satu pegawai hanya bisa memiliki satu perangkat absensi yang terkunci aktif.</p>
+                @include('admin.employees.employee-picker')
                 <label for="employee_code" class="block text-sm font-bold">Kode pegawai</label>
                 <input id="employee_code" name="employee_code" maxlength="30" required
                     value="{{ is_string(old('employee_code')) ? old('employee_code') : '' }}"

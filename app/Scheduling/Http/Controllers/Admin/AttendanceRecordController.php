@@ -12,16 +12,30 @@ use App\Scheduling\Models\RegisteredDevice;
 use App\Scheduling\Services\AttendanceRecordService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AttendanceRecordController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
+        $filters = $request->validate([
+            'search' => ['nullable', 'string', 'max:150'],
+            'date_from' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:0001-01-01'],
+            'date_to' => ['nullable', 'date_format:Y-m-d', $request->filled('date_from') ? 'after_or_equal:date_from' : 'after_or_equal:0001-01-01'],
+            'missing_checkout' => ['nullable', 'boolean'],
+        ]);
+        $records = AttendanceRecord::with('employee:id,full_name,employee_code')
+            ->when(($filters['search'] ?? '') !== '', fn ($query) => $query->whereHas('employee', fn ($employee) => $employee->matchingSearch($filters['search'])))
+            ->when($filters['date_from'] ?? null, fn ($query, $date) => $query->whereDate('work_date', '>=', $date))
+            ->when($filters['date_to'] ?? null, fn ($query, $date) => $query->whereDate('work_date', '<=', $date))
+            ->when($filters['missing_checkout'] ?? false, fn ($query) => $query->whereNotNull('check_in_at')->whereNull('check_out_at'));
+
         return view('admin.scheduling.attendance.index', [
-            'records' => AttendanceRecord::with('employee')->orderByDesc('work_date')->orderByDesc('id')->paginate(20),
+            'records' => $records->orderByDesc('work_date')->orderByDesc('id')->paginate(20)->appends($filters),
+            'filters' => $filters,
         ]);
     }
 

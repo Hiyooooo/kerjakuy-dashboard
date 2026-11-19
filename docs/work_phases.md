@@ -121,7 +121,7 @@ Untuk instalasi baru, isi `KERJAKUY_ADMIN_EMAIL` dan `KERJAKUY_ADMIN_PASSWORD`, 
 
 - [x] Buat satu header `requests` untuk cuti, terlambat, lembur, dan tukar shift.
 - [x] Buat permohonan cuti beserta rincian hari cuti dan entitlement yang dipakai.
-- [ ] Hitung saldo cuti dari jatah + carry over + penyesuaian − cuti disetujui.
+- [x] Hitung saldo cuti dari jatah + carry over + penyesuaian − cuti disetujui.
 - [ ] Buat permohonan terlambat.
 - [ ] Buat permohonan lembur.
 - [ ] Buat permohonan tukar shift; saat disetujui, buat override jadwal bagi kedua pegawai.

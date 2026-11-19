@@ -24,6 +24,32 @@ class AttendanceRecordTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_attendance_filters_and_keeps_the_filter_values_for_pagination(): void
+    {
+        $this->actingAs(User::factory()->create()->refresh())->withoutVite();
+        $employee = Employee::factory()->create(['full_name' => 'Nadia Contoh', 'employee_code' => 'PGW-NADIA']);
+        $record = AttendanceRecord::factory()->create(['employee_id' => $employee->id, 'late_minutes' => 7]);
+        AttendanceRecord::factory()->create(['employee_id' => $employee->id, 'work_date' => '2026-01-06', 'check_out_at' => now()]);
+        AttendanceRecord::factory()->create(['employee_id' => $employee->id, 'work_date' => '2026-01-07', 'check_in_at' => null]);
+        AttendanceRecord::factory()->create(['employee_id' => $employee->id, 'work_date' => '2026-01-08']);
+        AttendanceRecord::factory()->create();
+        $index = route('admin.attendance-records.index');
+
+        foreach (['nadia contoh', 'pgw-nadia'] as $search) {
+            $response = $this->get($index.'?'.http_build_query([
+                'search' => $search, 'date_from' => '2026-01-05', 'date_to' => '2026-01-07', 'missing_checkout' => 1,
+            ]))->assertOk();
+            $page = $response->viewData('records');
+            $this->assertSame([$record->id], $page->modelKeys());
+            $this->assertEquals($record->check_in_at, $page->first()->check_in_at);
+            $this->assertNull($page->first()->check_out_at);
+            $this->assertSame(7, $page->first()->late_minutes);
+            $this->assertStringContainsString('missing_checkout=1', $page->url(2));
+        }
+        $this->getJson($index.'?date_from=2026-02-01&date_to=2026-01-01')
+            ->assertUnprocessable()->assertJsonValidationErrors('date_to');
+    }
+
     public function test_admin_records_both_events_with_an_overnight_snapshot_and_private_evidence(): void
     {
         $this->travelTo(CarbonImmutable::parse('2026-11-19 12:00', 'Asia/Jakarta'));

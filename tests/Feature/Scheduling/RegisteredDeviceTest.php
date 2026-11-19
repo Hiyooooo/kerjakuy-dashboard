@@ -4,6 +4,9 @@ namespace Tests\Feature\Scheduling;
 
 use App\Access\Models\Role;
 use App\Access\Models\User;
+use App\Employee\Models\Employee;
+use App\Employee\Models\EmployeeEmploymentPeriod;
+use App\Scheduling\Models\EmployeeDeviceLock;
 use App\Scheduling\Models\RegisteredDevice;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -11,6 +14,31 @@ use Tests\TestCase;
 class RegisteredDeviceTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_device_filters_and_lock_employee_search(): void
+    {
+        $this->actingAs(User::factory()->create()->refresh())->withoutVite();
+        $device = RegisteredDevice::factory()->create(['device_name' => 'Terminal Utama']);
+        RegisteredDevice::factory()->create(['device_name' => 'Terminal Cadangan', 'status' => 'blocked']);
+        $locked = EmployeeDeviceLock::factory()->create(['registered_device_id' => $device->id]);
+        $candidate = Employee::factory()->create(['full_name' => 'Sari Contoh', 'employee_code' => 'PGW-SARI']);
+        foreach ([$locked->employee_id, $candidate->id] as $employeeId) {
+            EmployeeEmploymentPeriod::factory()->create(['employee_id' => $employeeId]);
+        }
+        $index = route('admin.registered-devices.index');
+        $page = $this->get($index.'?search=terminal&status=registered')->assertOk()->viewData('devices');
+        $this->assertSame([$device->id], $page->modelKeys());
+        $this->assertTrue($page->first()->activeLock->relationLoaded('employee'));
+        $this->assertSame($locked->employee_id, $page->first()->activeLock->employee->id);
+        $this->assertStringContainsString('status=registered', $page->url(2));
+        $this->assertSame([$device->id], $this->get($index.'?search='.$device->device_uuid)->assertOk()->viewData('devices')->modelKeys());
+
+        $available = RegisteredDevice::factory()->create();
+        $lookup = route('admin.registered-devices.locks.employees', $available);
+        $this->getJson($lookup.'?search=sari')->assertOk()->assertJsonPath('data.0.employee_code', $candidate->employee_code);
+        $this->getJson($lookup.'?search=PGW-SARI')->assertOk()->assertJsonCount(1, 'data');
+        $this->getJson($lookup.'?search='.$locked->employee->employee_code)->assertOk()->assertJsonCount(0, 'data');
+    }
 
     public function test_admin_can_register_a_device_but_cannot_overwrite_an_existing_uuid(): void
     {
