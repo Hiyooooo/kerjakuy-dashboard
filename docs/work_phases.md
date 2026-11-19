@@ -125,8 +125,8 @@ Untuk instalasi baru, isi `KERJAKUY_ADMIN_EMAIL` dan `KERJAKUY_ADMIN_PASSWORD`, 
 - [x] Buat permohonan terlambat.
 - [x] Buat permohonan lembur.
 - [x] Buat permohonan tukar shift; saat disetujui, buat override jadwal bagi kedua pegawai.
-- [ ] Buat daftar approval admin.
-- [ ] Buat aksi setujui, tolak, dan batalkan permohonan.
+- [x] Buat daftar approval admin.
+- [x] Buat aksi setujui, tolak, dan batalkan permohonan.
   - Saat menyetujui cuti, kunci baris pegawai dan jatah terkait, lalu hitung ulang saldo per tahun dengan perhitungan yang sama seperti saat pengajuan. Simpan keputusan dalam transaksi yang sama.
 - [ ] Simpan satu approver, waktu keputusan, serta catatan keputusan.
 - [ ] Terapkan bahwa detail permohonan wajib sesuai jenis request.

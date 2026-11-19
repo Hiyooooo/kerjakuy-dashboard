@@ -23,11 +23,7 @@ class LateRequestService
                     throw ValidationException::withMessages(['employee_code' => 'Kode pegawai tidak ditemukan.']);
                 }
 
-                $attendance = AttendanceRecord::where('employee_id', $employee->id)
-                    ->whereDate('work_date', $data['late_date'])->first();
-                if ($attendance?->check_in_at !== null && $attendance->late_minutes <= 0) {
-                    throw ValidationException::withMessages(['late_date' => 'Catatan absensi pada tanggal ini tidak menunjukkan keterlambatan setelah toleransi.']);
-                }
+                $attendance = $this->attendanceForLateRequest($employee->id, $data['late_date'], 'late_date');
 
                 $alreadyRequested = $employee->requests()->where('request_type', 'late')
                     ->whereIn('status', ['pending', 'approved'])
@@ -72,5 +68,15 @@ class LateRequestService
 
             throw $exception;
         }
+    }
+
+    public function attendanceForLateRequest(int $employeeId, string $workDate, string $field): ?AttendanceRecord
+    {
+        $attendance = AttendanceRecord::where('employee_id', $employeeId)->whereDate('work_date', $workDate)->first();
+        if ($attendance?->check_in_at !== null && $attendance->late_minutes <= 0) {
+            throw ValidationException::withMessages([$field => 'Catatan absensi pada tanggal ini tidak menunjukkan keterlambatan setelah toleransi.']);
+        }
+
+        return $attendance;
     }
 }

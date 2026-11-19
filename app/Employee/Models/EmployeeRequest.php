@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Validation\ValidationException;
 
 #[Fillable(['request_number', 'request_type', 'submitted_at'])]
 #[UseFactory(EmployeeRequestFactory::class)]
@@ -29,6 +30,24 @@ class EmployeeRequest extends Model
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewed_by_user_id');
+    }
+
+    public function ensurePending(): void
+    {
+        if ($this->status !== 'pending') {
+            throw ValidationException::withMessages(['approval' => 'Permohonan ini sudah diproses.']);
+        }
+    }
+
+    public function recordDecision(string $decision, User $actor, ?string $note): void
+    {
+        $this->forceFill([
+            'status' => $decision,
+            'reviewed_by_user_id' => $actor->id,
+            'reviewed_by_name' => $actor->name,
+            'reviewer_note' => $note,
+            'reviewed_at' => now(),
+        ])->saveOrFail();
     }
 
     protected function casts(): array

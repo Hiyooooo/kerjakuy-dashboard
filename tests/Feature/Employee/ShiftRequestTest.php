@@ -59,7 +59,8 @@ class ShiftRequestTest extends TestCase
         $approve = route('admin.shift-swap-requests.approve', $request);
         $this->get($show)->assertOk()->assertSee('Pagi → Siang');
         $this->assertDatabaseCount('employee_shift_schedules', 0);
-        $this->post($approve, ['reviewer_note' => 'Disepakati'])->assertRedirect($show)->assertSessionHasNoErrors();
+        $this->post(route('admin.request-approvals.decide', $request), ['decision' => 'approved', 'reviewer_note' => 'Disepakati'])
+            ->assertRedirect(route('admin.request-approvals.index'))->assertSessionHasNoErrors();
 
         $this->assertSame($second->id, $employee->shiftOverrides()->sole()->work_shift_id);
         $this->assertSame($first->id, $target->shiftOverrides()->sole()->work_shift_id);

@@ -2,6 +2,7 @@
 
 namespace App\Employee\Services;
 
+use App\Access\Models\User;
 use App\Employee\Models\Employee;
 use App\Employee\Models\EmployeeRequest;
 use App\Scheduling\Models\AttendanceRecord;
@@ -114,16 +115,16 @@ class ShiftRequestService
         });
     }
 
-    public function approveSwap(EmployeeRequest $request, int $actor, ?string $note): void
+    public function approveSwap(EmployeeRequest $request, User $actor, ?string $note): void
     {
         DB::transaction(function () use ($request, $actor, $note): void {
             $this->templates->lockChanges();
             $request = EmployeeRequest::query()->where('request_type', 'shift_swap')->lockForUpdate()->findOrFail($request->id);
-            if ($request->status !== 'pending') {
-                throw ValidationException::withMessages(['approval' => 'Permohonan ini sudah diproses.']);
-            }
+            $request->ensurePending();
             $detail = DB::table('shift_swap_request_details')->where('request_id', $request->id)->first();
-            abort_if($detail === null, 404);
+            if ($detail === null) {
+                throw ValidationException::withMessages(['approval' => 'Rincian permohonan belum tersedia.']);
+            }
             if ($detail->requester_schedule_snapshot === null || $detail->target_schedule_snapshot === null) {
                 throw ValidationException::withMessages(['approval' => 'Jam efektif saat pengajuan lama tidak tercatat. Buat permohonan baru.']);
             }
@@ -142,14 +143,9 @@ class ShiftRequestService
             $this->validateCheckInWindow($detail->requester_work_date, $partner['shift'], 'approval');
             $this->validateCheckInWindow($detail->target_work_date, $requester['shift'], 'approval');
 
-            $this->applyOverride($employee, $detail->requester_work_date, $partner['shift']->id, $request->request_number, $actor);
-            $this->applyOverride($target, $detail->target_work_date, $requester['shift']->id, $request->request_number, $actor);
-            $request->forceFill([
-                'status' => 'approved',
-                'reviewed_by_user_id' => $actor,
-                'reviewer_note' => $note,
-                'reviewed_at' => now(),
-            ])->saveOrFail();
+            $this->applyOverride($employee, $detail->requester_work_date, $partner['shift']->id, $request->request_number, $actor->id);
+            $this->applyOverride($target, $detail->target_work_date, $requester['shift']->id, $request->request_number, $actor->id);
+            $request->recordDecision('approved', $actor, $note);
         });
     }
 
