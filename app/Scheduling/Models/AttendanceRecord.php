@@ -10,11 +10,17 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Hidden(['check_in_selfie_path', 'check_out_selfie_path'])]
 class AttendanceRecord extends Model
 {
     use HasFactory;
+
+    public function faceRecognitionLogs(): HasMany
+    {
+        return $this->hasMany(FaceRecognitionLog::class);
+    }
 
     public function employee(): BelongsTo
     {

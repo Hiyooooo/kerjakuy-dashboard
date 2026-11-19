@@ -40,6 +40,7 @@ class AttendanceRecordController extends Controller
     {
         return view('admin.scheduling.attendance.detail', [
             'record' => $attendanceRecord->load(['employee', 'shift', 'method', 'location', 'device', 'checkInReason', 'checkOutReason']),
+            'verificationLogs' => $attendanceRecord->faceRecognitionLogs()->orderBy('captured_at')->orderBy('id')->get()->groupBy('verification_type'),
             'reasons' => OutOfLocationReason::where('is_active', true)->orderBy('name')->get(),
         ]);
     }
