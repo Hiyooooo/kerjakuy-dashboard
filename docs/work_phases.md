@@ -119,8 +119,8 @@ Untuk instalasi baru, isi `KERJAKUY_ADMIN_EMAIL` dan `KERJAKUY_ADMIN_PASSWORD`, 
 
 ## Tahap 5 — Permohonan dan approval
 
-- [ ] Buat satu header `requests` untuk cuti, terlambat, lembur, dan tukar shift.
-- [ ] Buat permohonan cuti beserta rincian hari cuti dan entitlement yang dipakai.
+- [x] Buat satu header `requests` untuk cuti, terlambat, lembur, dan tukar shift.
+- [x] Buat permohonan cuti beserta rincian hari cuti dan entitlement yang dipakai.
 - [ ] Hitung saldo cuti dari jatah + carry over + penyesuaian − cuti disetujui.
 - [ ] Buat permohonan terlambat.
 - [ ] Buat permohonan lembur.
