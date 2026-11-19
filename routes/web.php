@@ -9,6 +9,7 @@ use App\Employee\Http\Controllers\Admin\EmployeeIdentityController;
 use App\Employee\Http\Controllers\Admin\EmployeeJobAssignmentController;
 use App\Employee\Http\Controllers\Admin\LateRequestController;
 use App\Employee\Http\Controllers\Admin\LeaveRequestController;
+use App\Employee\Http\Controllers\Admin\ShiftRequestController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Organization\Http\Controllers\Admin\AttendanceLocationController;
 use App\Organization\Http\Controllers\Admin\AttendanceMethodController;
@@ -103,6 +104,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.accounts.
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.employees.manage'])->group(function (): void {
+    foreach (['overtime-requests', 'shift-swap-requests'] as $prefix) {
+        Route::prefix($prefix)->name($prefix.'.')->controller(ShiftRequestController::class)->group(function (): void {
+            Route::get('/', 'index')->name('index');
+            Route::get('create', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('{record}', 'show')->whereNumber('record')->name('show');
+        });
+    }
+    Route::post('shift-swap-requests/{record}/approve', [ShiftRequestController::class, 'approve'])
+        ->whereNumber('record')->name('shift-swap-requests.approve');
     Route::resource('late-requests', LateRequestController::class)->parameters(['late-requests' => 'lateRequest'])
         ->only(['index', 'create', 'store', 'show']);
     Route::get('late-requests/{lateRequest}/attachment', [LateRequestController::class, 'attachment'])
