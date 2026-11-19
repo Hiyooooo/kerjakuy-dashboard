@@ -54,6 +54,42 @@
             </div>
             @endcan
         </section>
+        <section class="mt-6 rounded-[22px] border border-line bg-white p-5">
+            <h2 class="font-heading text-xl font-extrabold">Verifikasi wajah</h2>
+            <dl class="mt-3 grid gap-3 sm:grid-cols-2">
+                @foreach (['check_in' => 'Masuk', 'check_out' => 'Pulang'] as $event => $label)
+                    <div>
+                        <dt class="font-bold">{{ $label }}</dt>
+                        @forelse ($verificationLogs->get($event, []) as $log)
+                            <dd class="mt-1 text-sm text-muted">
+                                {{ $log->status === 'passed' ? 'Lolos' : 'Gagal' }} · {{ $displayTime($log->captured_at) }}
+                                @if ($log->match_score !== null)
+                                    · Skor {{ $log->match_score }} / minimum {{ $log->minimum_match_score ?? '—' }}
+                                @endif
+                                @if ($log->failure_reason)
+                                    <p class="wrap-anywhere">{{ $log->failure_reason }}</p>
+                                @endif
+                                @can('admin.attendance.photos.view')
+                                    @if ($log->captured_photo_path)
+                                        <a href="{{ route('admin.face-verification-logs.photo', $log) }}" class="inline-flex min-h-11 items-center font-bold underline">Lihat foto verifikasi {{ Str::lower($label) }}</a>
+                                    @endif
+                                @endcan
+                            </dd>
+                        @empty
+                            <dd class="mt-1 text-sm text-muted">
+                                @if (! $record->{$event.'_at'})
+                                    Absensi {{ Str::lower($label) }} belum tercatat.
+                                @elseif (! $record->method->requires_face_verification)
+                                    Verifikasi wajah tidak diperlukan.
+                                @else
+                                    Hasil verifikasi belum tercatat.
+                                @endif
+                            </dd>
+                        @endforelse
+                    </div>
+                @endforeach
+            </dl>
+        </section>
     @endif
 
     @if (! $record || ($record->check_in_at && ! $record->check_out_at))

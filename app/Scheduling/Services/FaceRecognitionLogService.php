@@ -60,6 +60,10 @@ class FaceRecognitionLogService
             throw new LogicException('Record failed face verification before opening the attendance transaction.');
         }
 
+        if ($attendance !== null) {
+            $this->validateAttendanceEvent($attendance, $type, $capturedAt, $reason === null);
+        }
+
         try {
             $path = $photo?->store('face-verification-photos', 'local') ?: null;
         } catch (FilesystemException $exception) {
@@ -89,6 +93,30 @@ class FaceRecognitionLogService
             }
 
             throw $exception;
+        }
+    }
+
+    public function attachPassed(FaceRecognitionLog $log, AttendanceRecord $attendance): void
+    {
+        DB::transaction(function () use ($log, $attendance): void {
+            $log = FaceRecognitionLog::query()->lockForUpdate()->findOrFail($log->id);
+            $attendance = AttendanceRecord::query()->findOrFail($attendance->id);
+            if ($log->employee_id !== $attendance->employee_id
+                || ($log->attendance_record_id !== null && $log->attendance_record_id !== $attendance->id)) {
+                throw ValidationException::withMessages(['attendance' => 'Log verifikasi tidak sesuai dengan catatan absensi.']);
+            }
+
+            $this->validateAttendanceEvent($attendance, $log->verification_type, $log->captured_at, $log->status === 'passed');
+            $log->attendance_record_id = $attendance->id;
+            $log->saveOrFail();
+        });
+    }
+
+    private function validateAttendanceEvent(AttendanceRecord $attendance, string $type, CarbonImmutable $capturedAt, bool $passed): void
+    {
+        $eventAt = $type === 'check_in' ? $attendance->check_in_at : $attendance->check_out_at;
+        if (! $passed || $eventAt === null || ! $eventAt->utc()->isSameMinute($capturedAt->utc())) {
+            throw ValidationException::withMessages(['attendance' => 'Hasil lolos harus cocok dengan waktu dan jenis kejadian absensi.']);
         }
     }
 }

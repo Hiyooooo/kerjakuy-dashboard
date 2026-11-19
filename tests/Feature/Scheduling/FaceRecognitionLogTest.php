@@ -12,6 +12,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use LogicException;
 use Tests\TestCase;
 
@@ -53,9 +54,17 @@ class FaceRecognitionLogTest extends TestCase
         Storage::disk('local')->assertExists($failed->captured_photo_path);
 
         $attendance = AttendanceRecord::factory()->create(['employee_id' => $employee->id, 'work_date' => '2027-01-05']);
-        $passed = $service->record($employee, 'check_out', $capturedAt, 85, $profile, attendance: $attendance);
+        $passed = $service->record($employee, 'check_out', $capturedAt, 85, $profile);
         $this->assertSame('passed', $passed->status);
-        $this->assertSame($attendance->id, $passed->attendance_record_id);
+        try {
+            $service->attachPassed($passed, $attendance);
+            $this->fail('Checkout verification was attached before checkout existed.');
+        } catch (ValidationException) {
+            $this->assertNull($passed->refresh()->attendance_record_id);
+        }
+        $attendance->forceFill(['check_out_at' => $capturedAt->utc()])->saveOrFail();
+        $service->attachPassed($passed, $attendance);
+        $this->assertSame($attendance->id, $passed->refresh()->attendance_record_id);
 
         $photo = route('admin.face-verification-logs.photo', $failed);
         $this->get($photo)->assertRedirect(route('login'));
@@ -64,6 +73,10 @@ class FaceRecognitionLogTest extends TestCase
             ->assertOk()->assertSee('Skor di bawah batas minimum.')->assertSee('Belum terhubung ke catatan absensi.')
             ->assertDontSee('Lihat absensi')->assertDontSee('Lihat foto verifikasi');
         $this->get($photo)->assertForbidden();
+        $this->get(route('admin.attendance-records.show', $attendance))
+            ->assertOk()->assertSee('Verifikasi wajah tidak diperlukan.')
+            ->assertSee('Skor 85.00 / minimum 85.00')
+            ->assertDontSee('Skor di bawah batas minimum.');
         $this->actingAs(User::factory()->for(Role::where('code', 'hrd_admin')->firstOrFail())->create()->refresh());
         $this->get($photo)->assertOk()->assertHeader('Cache-Control', 'no-store, private');
 
