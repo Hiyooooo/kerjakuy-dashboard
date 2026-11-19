@@ -45,6 +45,11 @@ class Employee extends Model
         return $this->hasMany(EmployeeEmploymentPeriod::class);
     }
 
+    public function requests(): HasMany
+    {
+        return $this->hasMany(EmployeeRequest::class);
+    }
+
     public function assignments(): HasMany
     {
         return $this->hasMany(EmployeeJobAssignment::class);

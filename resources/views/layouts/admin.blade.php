@@ -61,6 +61,11 @@
                             </svg>
                             Data pegawai
                         </a>
+                        <a href="{{ route('admin.leave-requests.index') }}"
+                            @if (request()->routeIs('admin.leave-requests.*')) aria-current="page" @endif
+                            class="flex min-h-11 items-center rounded-[10px] px-2 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 md:px-3">
+                            Permohonan cuti
+                        </a>
                     @endcan
                     @can('admin.organization.manage')
                         @php($menuGroups = [

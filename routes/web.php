@@ -7,6 +7,7 @@ use App\Employee\Http\Controllers\Admin\EmployeeEmploymentPeriodController;
 use App\Employee\Http\Controllers\Admin\EmployeeFaceProfileController;
 use App\Employee\Http\Controllers\Admin\EmployeeIdentityController;
 use App\Employee\Http\Controllers\Admin\EmployeeJobAssignmentController;
+use App\Employee\Http\Controllers\Admin\LeaveRequestController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Organization\Http\Controllers\Admin\AttendanceLocationController;
 use App\Organization\Http\Controllers\Admin\AttendanceMethodController;
@@ -100,6 +101,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.accounts.
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.employees.manage'])->group(function (): void {
+    Route::prefix('leave-requests')->name('leave-requests.')->controller(LeaveRequestController::class)->group(function (): void {
+        Route::get('/', 'index')->name('index');
+        Route::get('create', 'create')->name('create');
+        Route::post('/', 'store')->name('store');
+        Route::get('entitlements/create', 'createEntitlement')->name('entitlements.create');
+        Route::post('entitlements', 'storeEntitlement')->name('entitlements.store');
+        Route::get('{leaveRequest}', 'show')->whereNumber('leaveRequest')->name('show');
+        Route::get('{leaveRequest}/attachment', 'attachment')->whereNumber('leaveRequest')->name('attachment');
+    });
     Route::get('employees/inactive', [EmployeeController::class, 'inactive'])->name('employees.inactive');
     Route::resource('employees', EmployeeController::class)->except(['show', 'destroy']);
     Route::get('employees/{employee}/identity', [EmployeeIdentityController::class, 'edit'])->name('employees.identity.edit');
