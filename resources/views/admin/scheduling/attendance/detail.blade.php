@@ -5,8 +5,11 @@
 @endphp
 @section('title', $title)
 
+@section('breadcrumb-parent')
+    <a href="{{ route('admin.attendance-records.index') }}" class="inline-flex min-h-11 items-center hover:underline">Catatan absensi</a>
+@endsection
+
 @section('content')
-    <a href="{{ route('admin.attendance-records.index') }}" class="inline-flex min-h-11 items-center font-bold underline">Kembali ke catatan absensi</a>
     <h1 data-enter class="mt-2 font-heading text-[40px] leading-tight font-extrabold tracking-tight">{{ $title }}</h1>
     @if (session('attendance_status'))
         <p role="status" class="mt-4 font-bold text-[#26734d]">{{ session('attendance_status') }}</p>
@@ -18,18 +21,25 @@
         @endphp
         <section class="mt-6 rounded-[22px] border border-line bg-white p-5">
             <h2 class="font-heading text-xl font-extrabold">{{ $record->employee->full_name }} · {{ $record->work_date->locale('id')->translatedFormat('j F Y') }}</h2>
+            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                @foreach (['Masuk' => [$record->scheduled_check_in_at, $record->check_in_at], 'Pulang' => [$record->scheduled_check_out_at, $record->check_out_at]] as $event => [$scheduled, $actual])
+                    <div class="rounded-[10px] bg-paper p-4">
+                        <h3 class="font-bold">{{ $event }}</h3>
+                        <dl class="mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm tabular-nums">
+                            <dt class="text-muted">Jadwal</dt><dd>{{ $displayTime($scheduled) }}</dd>
+                            <dt class="text-muted">Aktual</dt><dd class="font-bold">{{ $actual ? $displayTime($actual) : 'Belum tercatat' }}</dd>
+                        </dl>
+                    </div>
+                @endforeach
+            </div>
             <dl class="mt-3 grid gap-3 sm:grid-cols-2">
                 @foreach ([
                     'Shift' => $record->shift->name,
                     'Metode' => $record->method->name,
                     'Lokasi acuan' => $record->location?->name,
                     'Perangkat' => $record->device?->device_name ?: $record->device?->device_uuid,
-                    'Jadwal masuk' => $displayTime($record->scheduled_check_in_at),
-                    'Jadwal pulang' => $displayTime($record->scheduled_check_out_at),
                     'Batas absen pulang' => $record->check_out_deadline_at ? $displayTime($record->check_out_deadline_at) : null,
                     'Radius acuan' => $record->location_radius_snapshot !== null ? $record->location_radius_snapshot.' m' : null,
-                    'Masuk' => $record->check_in_at ? $displayTime($record->check_in_at) : null,
-                    'Pulang' => $record->check_out_at ? $displayTime($record->check_out_at) : null,
                     'Keterlambatan' => $record->late_minutes.' menit',
                     'Jarak saat masuk' => $record->distance_meter !== null ? number_format($record->distance_meter, 2, ',', '.').' m' : null,
                     'Jarak saat pulang' => $record->check_out_distance_meter !== null ? number_format($record->check_out_distance_meter, 2, ',', '.').' m' : null,
@@ -126,7 +136,17 @@
                         ];
                     }
                 @endphp
-                @foreach ($fields as $field => $definition)
+                @php
+                    $groups = [
+                        'Pegawai dan jadwal' => array_intersect_key($fields, array_flip(['employee_code', 'work_date', 'method_id'])),
+                        'Waktu absensi' => ['recorded_at' => $fields['recorded_at']],
+                        'Lokasi dan bukti' => array_diff_key($fields, array_flip(['employee_code', 'work_date', 'method_id', 'recorded_at'])),
+                    ];
+                @endphp
+                @foreach (array_filter($groups) as $group => $groupFields)
+                <fieldset class="grid min-w-0 gap-3">
+                    <legend class="mb-2 font-heading font-extrabold">{{ $group }}</legend>
+                @foreach ($groupFields as $field => $definition)
                     @php
                         [$label, $type, $required] = $definition;
                         $previous = is_scalar(old($field)) ? old($field) : '';
@@ -157,7 +177,12 @@
                         @error($field)<p id="{{ $field }}-error" class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>@enderror
                     </div>
                 @endforeach
-                <button type="submit" class="min-h-12 rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 sm:justify-self-start">{{ $record ? 'Simpan absensi pulang' : 'Simpan absensi masuk' }}</button>
+                </fieldset>
+                @endforeach
+                <div class="flex flex-wrap gap-2 border-t border-line pt-4">
+                    <button type="submit" class="min-h-12 rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85">{{ $record ? 'Simpan absensi pulang' : 'Simpan absensi masuk' }}</button>
+                    <a href="{{ route('admin.attendance-records.index') }}" class="inline-flex min-h-12 items-center rounded-[10px] px-4 font-bold hover:bg-paper">Batal</a>
+                </div>
             </form>
         </section>
     @endif

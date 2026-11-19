@@ -4,8 +4,11 @@
 @endphp
 @section('title', $title)
 
+@section('breadcrumb-parent')
+    <a href="{{ route('admin.leave-requests.index') }}" class="inline-flex min-h-11 items-center hover:underline">Permohonan cuti</a>
+@endsection
+
 @section('content')
-    <a href="{{ route('admin.leave-requests.index') }}" class="inline-flex min-h-11 items-center font-bold underline">Kembali ke permohonan cuti</a>
     <h1 data-enter class="mt-2 font-heading text-[40px] leading-tight font-extrabold tracking-tight">{{ $title }}</h1>
     @if (session('leave_status'))
         <p role="status" class="mt-4 text-[#26734d]">{{ session('leave_status') }}</p>
@@ -15,8 +18,11 @@
         <a href="{{ route('admin.leave-requests.entitlements.create') }}" class="inline-flex min-h-11 items-center text-sm font-bold underline">Tambahkan jatah cuti</a>
     @endunless
     <form method="POST" enctype="multipart/form-data" action="{{ route($entitlement ? 'admin.leave-requests.entitlements.store' : 'admin.leave-requests.store') }}"
+        data-employee-picker="{{ route('admin.leave-requests.employees') }}"
+        @unless ($entitlement) data-leave-balance="{{ route('admin.leave-requests.balance') }}" @endunless
         class="mt-4 grid max-w-xl gap-4 rounded-[22px] border border-line bg-white p-5 sm:p-6">
         @csrf
+        @include('admin.employees.employee-picker')
         @php
             $fields = ['employee_code' => ['Kode pegawai', 'text']];
             if ($entitlement) {
@@ -76,6 +82,17 @@
                 @error('attachment')<p class="mt-1 text-sm text-[#b42318]">{{ $message }}</p>@enderror
             </div>
         @endunless
-        <button type="submit" class="min-h-12 rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 sm:justify-self-start">{{ $entitlement ? 'Simpan jatah cuti' : 'Simpan permohonan' }}</button>
+        @unless ($entitlement)
+            <section data-balance-panel hidden class="rounded-[10px] bg-paper p-4">
+                <h2 class="font-bold">Saldo dan durasi cuti</h2>
+                <p class="mt-1 text-sm text-muted">Permohonan yang menunggu persetujuan belum mengurangi saldo.</p>
+                <button type="button" data-balance-check class="mt-2 min-h-11 rounded-[10px] border border-control px-3 font-bold hover:bg-white">Cek saldo cuti</button>
+                <p role="status" data-balance-result class="mt-2 whitespace-pre-line text-sm"></p>
+            </section>
+        @endunless
+        <div class="flex flex-wrap gap-2 border-t border-line pt-4">
+            <button type="submit" class="min-h-12 rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85">{{ $entitlement ? 'Simpan jatah cuti' : 'Simpan permohonan' }}</button>
+            <a href="{{ route('admin.leave-requests.index') }}" class="inline-flex min-h-12 items-center rounded-[10px] px-4 font-bold hover:bg-paper">Batal</a>
+        </div>
     </form>
 @endsection

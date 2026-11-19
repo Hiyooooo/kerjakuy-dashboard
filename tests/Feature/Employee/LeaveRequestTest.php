@@ -17,6 +17,59 @@ class LeaveRequestTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_leave_filters_and_available_balance_include_only_approved_usage(): void
+    {
+        $admin = User::factory()->for(Role::where('code', 'hrd_admin')->firstOrFail())->create()->refresh();
+        $this->actingAs($admin)->withoutVite();
+        $employee = Employee::factory()->create(['full_name' => 'Rina Contoh', 'employee_code' => 'PGW-RINA']);
+        $category = LeaveCategory::factory()->create();
+        $common = ['employee_code' => $employee->employee_code, 'leave_category_id' => $category->id];
+        $this->post(route('admin.leave-requests.entitlements.store'), [
+            ...$common, 'entitlement_year' => 2027, 'granted_days' => '1.5', 'carry_over_days' => '0.25',
+        ])->assertSessionHasNoErrors();
+        $entitlement = DB::table('employee_leave_entitlements')->sole();
+        DB::table('leave_balance_adjustments')->insert([
+            'employee_leave_entitlement_id' => $entitlement->id, 'adjustment_days' => '-0.25',
+            'adjusted_by_user_id' => $admin->id, 'adjusted_at' => now(), 'reason' => 'Koreksi jatah',
+        ]);
+        $store = route('admin.leave-requests.store');
+        $this->post($store, [...$common, 'days' => [
+            ['date' => '2027-02-01', 'duration' => '0.25'],
+            ['date' => '2027-02-03', 'duration' => '0.5'],
+        ]])->assertSessionHasNoErrors();
+        $approved = EmployeeRequest::query()->sole();
+        $approved->forceFill(['status' => 'approved'])->saveOrFail();
+        $this->post($store, [...$common, 'days' => [['date' => '2027-02-04', 'duration' => '0.25']]])->assertSessionHasNoErrors();
+
+        $lookup = route('admin.leave-requests.employees', ['search' => 'rina contoh']);
+        $this->getJson($lookup)->assertOk()->assertJsonPath('data.0.id', $employee->id);
+        $balance = route('admin.leave-requests.balance', [
+            'employee_id' => $employee->id, 'leave_category_id' => $category->id,
+            'dates' => ['2027-02-01', '2027-02-03', '2028-01-01'],
+        ]);
+        $this->getJson($balance)->assertOk()->assertExactJson(['data' => [
+            ['entitlement_year' => 2027, 'available_days' => '0.75'],
+            ['entitlement_year' => 2028, 'available_days' => null],
+        ]]);
+        foreach (['rina contoh', 'pgw-rina', strtolower($approved->request_number)] as $search) {
+            $index = route('admin.leave-requests.index', ['search' => $search, 'status' => 'approved']);
+            $page = $this->get($index)->assertOk()->viewData('requests');
+            $this->assertSame([$approved->id], $page->modelKeys());
+            $this->assertSame($category->name, $page->first()->category);
+            $this->assertSame(['2027-02-01', '2027-02-03'], $page->first()->leave_dates);
+            $this->assertSame('0.75', $page->first()->total_days);
+            $this->assertSame('approved', $page->first()->status);
+            $this->assertStringContainsString('status=approved', $page->url(2));
+        }
+        $this->post($store, [...$common, 'days' => [
+            ['date' => '2027-02-05', 'duration' => '0.5'],
+            ['date' => '2027-02-07', 'duration' => '0.26'],
+        ]])->assertSessionHasErrors('days.1.duration');
+        $this->assertDatabaseCount('requests', 2);
+        $this->actingAs(User::factory()->create()->refresh());
+        $this->getJson($balance)->assertForbidden();
+    }
+
     public function test_admin_submits_leave_across_years_and_each_day_uses_its_own_entitlement(): void
     {
         $this->actingAs(User::factory()->for(Role::where('code', 'hrd_admin')->firstOrFail())->create()->refresh())->withoutVite();

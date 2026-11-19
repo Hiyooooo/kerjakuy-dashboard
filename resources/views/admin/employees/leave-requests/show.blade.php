@@ -1,8 +1,11 @@
 @extends('layouts.admin')
 @section('title', 'Rincian cuti')
 
+@section('breadcrumb-parent')
+    <a href="{{ route('admin.leave-requests.index') }}" class="inline-flex min-h-11 items-center hover:underline">Permohonan cuti</a>
+@endsection
+
 @section('content')
-    <a href="{{ route('admin.leave-requests.index') }}" class="inline-flex min-h-11 items-center font-bold underline">Kembali ke permohonan cuti</a>
     <h1 data-enter class="mt-2 font-heading text-[40px] leading-tight font-extrabold tracking-tight">Rincian cuti</h1>
     @if (session('leave_status'))
         <p role="status" class="mt-3 text-[#26734d]">{{ session('leave_status') }}</p>
@@ -11,6 +14,9 @@
         <h2 class="font-heading text-xl font-extrabold">{{ $leaveRequest->employee->full_name }} · {{ $leaveRequest->employee->employee_code }}</h2>
         <p class="mt-1 text-sm text-muted">{{ $leaveRequest->request_number }} · {{ $detail->category }}</p>
         <p class="mt-1 text-sm font-bold">{{ ['pending' => 'Menunggu persetujuan', 'approved' => 'Disetujui', 'rejected' => 'Ditolak', 'cancelled' => 'Dibatalkan'][$leaveRequest->status] }}</p>
+        @if ($leaveRequest->status === 'pending')
+            <p class="mt-1 text-sm text-muted">Permohonan ini belum mengurangi saldo cuti. Persetujuan belum tersedia di halaman ini.</p>
+        @endif
         @if ($detail->reason)
             <p class="mt-2 wrap-anywhere whitespace-pre-wrap">{{ $detail->reason }}</p>
         @endif

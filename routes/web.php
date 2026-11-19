@@ -45,6 +45,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.devices.m
     Route::prefix('registered-devices/{registeredDevice}/locks')->name('registered-devices.locks.')->scopeBindings()
         ->controller(EmployeeDeviceLockController::class)->group(function (): void {
             Route::get('/', 'index')->name('index');
+            Route::get('employees', 'employees')->name('employees');
             Route::post('/', 'store')->name('store');
             Route::patch('{deviceLock}/release', 'release')->name('release');
         });
@@ -103,6 +104,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.accounts.
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.employees.manage'])->group(function (): void {
     Route::prefix('leave-requests')->name('leave-requests.')->controller(LeaveRequestController::class)->group(function (): void {
         Route::get('/', 'index')->name('index');
+        Route::get('employees', 'employees')->name('employees');
+        Route::get('balance', 'balance')->name('balance');
         Route::get('create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
         Route::get('entitlements/create', 'createEntitlement')->name('entitlements.create');

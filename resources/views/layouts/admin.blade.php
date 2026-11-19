@@ -61,76 +61,74 @@
                             </svg>
                             Data pegawai
                         </a>
-                        <a href="{{ route('admin.leave-requests.index') }}"
-                            @if (request()->routeIs('admin.leave-requests.*')) aria-current="page" @endif
-                            class="flex min-h-11 items-center rounded-[10px] px-2 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 md:px-3">
-                            Permohonan cuti
-                        </a>
                     @endcan
-                    @can('admin.organization.manage')
-                        @php($menuGroups = [
-                            'Master data' => [
-                            'positions' => ['Jabatan', 'M3 7h18v14H3z M8 7V3h8v4 M3 13h18 M10 13v2h4v-2'],
-                            'offices' => ['Kantor', 'M4 21V4h12v17 M16 10h4v11 M2 21h20 M8 8h4 M8 12h4 M8 16h4'],
-                            'job-desks' => ['Job desk', 'M6 3h9l4 4v14H6z M14 3v5h5 M9 12h7 M9 16h7'],
-                            'leave-categories' => ['Kategori cuti', 'M3 12V4h8l10 10-7 7z M7 8h.01'],
-                            'holidays' => ['Hari libur', 'M3 6h18v15H3z M7 3v6 M17 3v6 M3 11h18 M9 16l2 2 4-4'],
-                            ],
-                            'Absensi' => [
-                            'attendance-times' => ['Waktu absen', 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z M12 7v5l3 2'],
-                            'out-of-location-reasons' => ['Alasan di luar lokasi', 'M21 4H3v13h5v4l5-4h8z M7 9h10 M7 13h6'],
-                            'attendance-methods' => ['Metode absen', 'M4 6h16M4 12h16M4 18h16 M8 4v4 M16 10v4 M10 16v4'],
-                            'face-tolerance-policies' => ['Toleransi wajah', 'M8 3H3v5 M16 3h5v5 M21 16v5h-5 M3 16v5h5 M9 10h.01 M15 10h.01 M9 15q3 3 6 0'],
-                            'attendance-locations' => ['Lokasi absen', 'M20 10c0 5-8 11-8 11s-8-6-8-11a8 8 0 1 1 16 0Z M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'],
-                            ],
-                            'Jadwal kerja' => [
-                            'work-shifts' => ['Shift kerja', 'M12 6v6l4 2 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'],
-                            'work-schedule-templates' => ['Template jadwal mingguan', 'M3 6h18v15H3z M7 3v6 M17 3v6 M3 11h18'],
-                            ],
-                        ])
-                        @foreach ($menuGroups as $groupLabel => $items)
-                            <details class="group" @if (request()->routeIs(...array_map(fn ($route) => 'admin.'.$route.'.*', array_keys($items)))) open @endif>
-                                <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-[10px] px-3 text-sm font-extrabold hover:bg-paper [&::-webkit-details-marker]:hidden">
-                                    {{ $groupLabel }}
-                                    <svg aria-hidden="true" class="size-4 shrink-0 group-open:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="m9 6 6 6-6 6"/>
-                                    </svg>
-                                </summary>
-                                <div class="ml-3 space-y-1 border-l border-line pl-2">
-                                    @foreach ($items as $route => [$label, $iconPath])
-                                        <a href="{{ route('admin.'.$route.'.index') }}"
-                                            @if (request()->routeIs('admin.'.$route.'.*')) aria-current="page" @endif
-                                            class="flex min-h-11 items-center gap-2 rounded-[10px] px-2 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors">
-                                            <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="{{ $iconPath }}"/>
-                                            </svg>
-                                            {{ $label }}
-                                        </a>
-                                    @endforeach
-                                </div>
-                            </details>
-                        @endforeach
-                    @endcan
-                    @can('admin.attendance.manage')
-                        <a href="{{ route('admin.attendance-records.index') }}"
-                            @if (request()->routeIs('admin.attendance-records.*')) aria-current="page" @endif
-                            class="flex min-h-11 items-center gap-2 rounded-[10px] px-2 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 md:px-3">
-                            <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="4" y="4" width="16" height="16" rx="2"/><path d="m8 12 3 3 5-6"/>
-                            </svg>
-                            Catatan absensi
-                        </a>
-                    @endcan
-                    @can('admin.devices.manage')
-                        <a href="{{ route('admin.registered-devices.index') }}"
-                            @if (request()->routeIs('admin.registered-devices.*')) aria-current="page" @endif
-                            class="flex min-h-11 items-center gap-2 rounded-[10px] px-2 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors md:mt-1 md:gap-3 md:px-3">
-                            <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                                <rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/>
-                            </svg>
-                            Perangkat absensi
-                        </a>
-                    @endcan
+                    @php
+                        $user = auth()->user();
+                        $menuGroups = [];
+                        if ($user->can('admin.employees.manage')) {
+                            $menuGroups['Permohonan'] = [
+                                'leave-requests' => ['Permohonan cuti', 'M5 3h10l4 4v14H5z M14 3v5h5 M8 14l2 2 5-5'],
+                            ];
+                        }
+                        if ($user->can('admin.organization.manage')) {
+                            $menuGroups += [
+                                'Master data' => [
+                                    'positions' => ['Jabatan', 'M3 7h18v14H3z M8 7V3h8v4 M3 13h18 M10 13v2h4v-2'],
+                                    'offices' => ['Kantor', 'M4 21V4h12v17 M16 10h4v11 M2 21h20 M8 8h4 M8 12h4 M8 16h4'],
+                                    'job-desks' => ['Job desk', 'M6 3h9l4 4v14H6z M14 3v5h5 M9 12h7 M9 16h7'],
+                                    'leave-categories' => ['Kategori cuti', 'M3 12V4h8l10 10-7 7z M7 8h.01'],
+                                    'holidays' => ['Hari libur', 'M3 6h18v15H3z M7 3v6 M17 3v6 M3 11h18 M9 16l2 2 4-4'],
+                                ],
+                                'Pengaturan absensi' => [
+                                    'attendance-times' => ['Waktu absen', 'M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z M12 7v5l3 2'],
+                                    'out-of-location-reasons' => ['Alasan di luar lokasi', 'M21 4H3v13h5v4l5-4h8z M7 9h10 M7 13h6'],
+                                    'attendance-methods' => ['Metode absen', 'M4 6h16M4 12h16M4 18h16 M8 4v4 M16 10v4 M10 16v4'],
+                                    'face-tolerance-policies' => ['Toleransi wajah', 'M8 3H3v5 M16 3h5v5 M21 16v5h-5 M3 16v5h5 M9 10h.01 M15 10h.01 M9 15q3 3 6 0'],
+                                    'attendance-locations' => ['Lokasi absen', 'M20 10c0 5-8 11-8 11s-8-6-8-11a8 8 0 1 1 16 0Z M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z'],
+                                ],
+                                'Jadwal kerja' => [
+                                    'work-shifts' => ['Shift kerja', 'M12 6v6l4 2 M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z'],
+                                    'work-schedule-templates' => ['Template jadwal mingguan', 'M3 6h18v15H3z M7 3v6 M17 3v6 M3 11h18'],
+                                ],
+                            ];
+                        }
+                        if ($user->can('admin.attendance.manage')) {
+                            $menuGroups['Operasional absensi']['attendance-records'] = [
+                                'Catatan absensi', 'M4 4h16v16H4z M8 12l3 3 5-6',
+                            ];
+                        }
+                        if ($user->can('admin.devices.manage')) {
+                            $menuGroups['Operasional absensi']['registered-devices'] = [
+                                'Perangkat absensi', 'M6 2h12v20H6z M11 18h2',
+                            ];
+                        }
+
+                        $activeMenu = request()->routeIs('admin.face-verification-logs.*')
+                            ? 'attendance-records'
+                            : explode('.', request()->route()?->getName() ?? '')[1] ?? '';
+                    @endphp
+                    @foreach ($menuGroups as $groupLabel => $items)
+                        <details class="group" @if (isset($items[$activeMenu])) open @endif>
+                            <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-[10px] px-3 text-sm font-extrabold hover:bg-paper [&::-webkit-details-marker]:hidden">
+                                {{ $groupLabel }}
+                                <svg aria-hidden="true" class="size-4 shrink-0 group-open:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m9 6 6 6-6 6"/>
+                                </svg>
+                            </summary>
+                            <div class="ml-3 space-y-1 border-l border-line pl-2">
+                                @foreach ($items as $route => [$label, $iconPath])
+                                    <a href="{{ route('admin.'.$route.'.index') }}"
+                                        @if ($route === $activeMenu) aria-current="page" @endif
+                                        class="flex min-h-11 items-center gap-2 rounded-[10px] px-2 text-sm font-bold hover:bg-paper aria-[current=page]:bg-coral/20 motion-safe:transition-colors">
+                                        <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="{{ $iconPath }}"/>
+                                        </svg>
+                                        {{ $label }}
+                                    </a>
+                                @endforeach
+                            </div>
+                        </details>
+                    @endforeach
                 </nav>
             </div>
         </aside>

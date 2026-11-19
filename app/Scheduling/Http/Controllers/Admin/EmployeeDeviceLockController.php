@@ -2,12 +2,14 @@
 
 namespace App\Scheduling\Http\Controllers\Admin;
 
+use App\Employee\Models\Employee;
 use App\Http\Controllers\Controller;
 use App\Scheduling\Http\Requests\StoreEmployeeDeviceLockRequest;
 use App\Scheduling\Models\EmployeeDeviceLock;
 use App\Scheduling\Models\RegisteredDevice;
 use App\Scheduling\Services\EmployeeDeviceLockService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -18,9 +20,24 @@ class EmployeeDeviceLockController extends Controller
     {
         return view('admin.scheduling.employee-device-locks', [
             'device' => $registeredDevice,
-            'activeLock' => $registeredDevice->deviceLocks()->whereNull('released_at')->with('employee')->first(),
+            'activeLock' => $registeredDevice->activeLock()->with('employee')->first(),
             'locks' => $registeredDevice->deviceLocks()->with(['employee', 'lockedBy', 'releasedBy'])->orderByDesc('id')->paginate(15),
         ]);
+    }
+
+    public function employees(Request $request, RegisteredDevice $registeredDevice): JsonResponse
+    {
+        $filters = $request->validate(['search' => ['required', 'string', 'max:150']]);
+        $today = today('Asia/Jakarta')->toDateString();
+        $employees = Employee::query()->matchingSearch($filters['search'])
+            ->whereHas('periods', fn ($period) => $period->where('status', 'active')
+                ->whereDate('effective_start_date', '<=', $today)
+                ->where(fn ($end) => $end->whereNull('effective_end_date')->orWhereDate('effective_end_date', '>=', $today)))
+            ->whereNotExists(EmployeeDeviceLock::query()->whereColumn('employee_id', 'employees.id')->whereNull('released_at')->select('id'))
+            ->orderBy('full_name')->orderBy('id')->limit(20)
+            ->get(['id', 'full_name', 'employee_code']);
+
+        return response()->json(['data' => $employees]);
     }
 
     public function store(StoreEmployeeDeviceLockRequest $request, RegisteredDevice $registeredDevice, EmployeeDeviceLockService $service): RedirectResponse
