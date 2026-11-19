@@ -28,9 +28,19 @@ class LeaveRequestTest extends TestCase
             ...$common, 'entitlement_year' => 2027, 'granted_days' => '1.5', 'carry_over_days' => '0.25',
         ])->assertSessionHasNoErrors();
         $entitlement = DB::table('employee_leave_entitlements')->sole();
-        DB::table('leave_balance_adjustments')->insert([
+        $adjustmentRoute = route('admin.leave-requests.balances.adjustments.store');
+        $adjustment = [
+            'employee_id' => $employee->id, 'leave_category_id' => $category->id,
+            'year' => 2027, 'adjustment_days' => '-0.25', 'reason' => 'Koreksi jatah',
+        ];
+        $this->post($adjustmentRoute, [...$adjustment, 'adjustment_days' => '0.00'])->assertSessionHasErrors('adjustment_days');
+        $this->post($adjustmentRoute, [...$adjustment, 'year' => 2028])->assertSessionHasErrors('adjustment_days');
+        $this->post($adjustmentRoute, $adjustment)->assertRedirect(route('admin.leave-requests.balances', [...$common, 'year' => 2027]))
+            ->assertSessionHasNoErrors();
+        $this->assertDatabaseCount('leave_balance_adjustments', 1);
+        $this->assertDatabaseHas('leave_balance_adjustments', [
             'employee_leave_entitlement_id' => $entitlement->id, 'adjustment_days' => '-0.25',
-            'adjusted_by_user_id' => $admin->id, 'adjusted_at' => now(), 'reason' => 'Koreksi jatah',
+            'adjusted_by_user_id' => $admin->id, 'reason' => 'Koreksi jatah',
         ]);
         $store = route('admin.leave-requests.store');
         $this->post($store, [...$common, 'days' => [
@@ -51,6 +61,12 @@ class LeaveRequestTest extends TestCase
             ['entitlement_year' => 2027, 'available_days' => '0.75'],
             ['entitlement_year' => 2028, 'available_days' => null],
         ]]);
+        $this->get(route('admin.leave-requests.balances', [
+            ...$common, 'year' => 2027,
+        ]))->assertOk()
+            ->assertSee('data-employee-picker="'.route('admin.leave-requests.employees').'"', false)
+            ->assertSee('Cari nama atau kode pegawai')
+            ->assertSee('Saldo tersedia')->assertSee('0,75 hari')->assertSee('Rina Contoh');
         foreach (['rina contoh', 'pgw-rina', strtolower($approved->request_number)] as $search) {
             $index = route('admin.leave-requests.index', ['search' => $search, 'status' => 'approved']);
             $page = $this->get($index)->assertOk()->viewData('requests');
@@ -68,6 +84,7 @@ class LeaveRequestTest extends TestCase
         $this->assertDatabaseCount('requests', 2);
         $this->actingAs(User::factory()->create()->refresh());
         $this->getJson($balance)->assertForbidden();
+        $this->post($adjustmentRoute, $adjustment)->assertForbidden();
     }
 
     public function test_admin_submits_leave_across_years_and_each_day_uses_its_own_entitlement(): void
@@ -113,7 +130,7 @@ class LeaveRequestTest extends TestCase
         Storage::disk('local')->assertExists($path);
         $this->get(route('admin.leave-requests.index'))->assertOk()->assertSee($request->request_number);
         $this->get(route('admin.leave-requests.show', $request))->assertOk()->assertSee('Jatah 2026')->assertSee('Jatah 2027');
-        $this->get(route('admin.leave-requests.attachment', $request))->assertOk();
+        $this->get(route('admin.leave-requests.attachment', $request))->assertOk()->assertDownload(basename($path));
 
         $this->actingAs(User::factory()->create()->refresh());
         $this->get(route('admin.leave-requests.attachment', $request))->assertForbidden();

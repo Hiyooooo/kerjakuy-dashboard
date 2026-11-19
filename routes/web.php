@@ -7,6 +7,7 @@ use App\Employee\Http\Controllers\Admin\EmployeeEmploymentPeriodController;
 use App\Employee\Http\Controllers\Admin\EmployeeFaceProfileController;
 use App\Employee\Http\Controllers\Admin\EmployeeIdentityController;
 use App\Employee\Http\Controllers\Admin\EmployeeJobAssignmentController;
+use App\Employee\Http\Controllers\Admin\LateRequestController;
 use App\Employee\Http\Controllers\Admin\LeaveRequestController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Organization\Http\Controllers\Admin\AttendanceLocationController;
@@ -102,10 +103,16 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.accounts.
 });
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.employees.manage'])->group(function (): void {
+    Route::resource('late-requests', LateRequestController::class)->parameters(['late-requests' => 'lateRequest'])
+        ->only(['index', 'create', 'store', 'show']);
+    Route::get('late-requests/{lateRequest}/attachment', [LateRequestController::class, 'attachment'])
+        ->whereNumber('lateRequest')->name('late-requests.attachment');
     Route::prefix('leave-requests')->name('leave-requests.')->controller(LeaveRequestController::class)->group(function (): void {
         Route::get('/', 'index')->name('index');
         Route::get('employees', 'employees')->name('employees');
         Route::get('balance', 'balance')->name('balance');
+        Route::get('balances', 'balancePage')->name('balances');
+        Route::post('balances/adjustments', 'storeAdjustment')->name('balances.adjustments.store');
         Route::get('create', 'create')->name('create');
         Route::post('/', 'store')->name('store');
         Route::get('entitlements/create', 'createEntitlement')->name('entitlements.create');
