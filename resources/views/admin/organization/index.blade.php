@@ -3,9 +3,9 @@
 @section('title', $label)
 
 @section('content')
-    <div data-enter class="flex flex-wrap items-center justify-between gap-4">
-        <h1 class="font-heading text-[40px] leading-tight font-extrabold tracking-tight">{{ $label }}</h1>
-        <a href="{{ route('admin.'.$resource.'.create') }}" class="inline-flex min-h-12 items-center rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">
+    <div data-enter class="admin-page-header">
+        <h1 class="admin-title">{{ $label }}</h1>
+        <a href="{{ route('admin.'.$resource.'.create') }}" class="admin-button admin-button--primary">
             Tambah {{ Str::lower($label) }}
         </a>
     </div>
@@ -15,9 +15,9 @@
     @endif
 
     @if ($records->isEmpty())
-        <p class="mt-6 rounded-[22px] border border-line bg-white p-6 text-muted">Belum ada {{ Str::lower($label) }} di halaman ini.</p>
+        <p class="mt-6 admin-panel p-6 text-muted">Belum ada {{ Str::lower($label) }} di halaman ini.</p>
     @else
-        <div class="mt-6 overflow-hidden rounded-[22px] border border-line bg-white">
+        <div class="mt-6 admin-panel admin-table" role="region" aria-label="Daftar data master" tabindex="0">
             <table class="w-full table-fixed text-left text-sm">
                 <thead class="border-b border-line bg-paper">
                     <tr>

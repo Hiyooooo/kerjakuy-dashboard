@@ -4,6 +4,7 @@ namespace App\Access\Services;
 
 use App\Access\Models\User;
 use App\Employee\Models\Employee;
+use App\Employee\Models\EmployeeCoaching;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -104,6 +105,15 @@ class AccountService
 
     public function delete(User $user): void
     {
-        $user->delete();
+        DB::transaction(function () use ($user): void {
+            $account = User::query()->lockForUpdate()->findOrFail($user->getKey());
+            if (EmployeeCoaching::query()->whereBelongsTo($account, 'createdBy')->exists()) {
+                throw ValidationException::withMessages([
+                    'account_deletion' => 'Akun ini mencatat pembinaan pegawai. Nonaktifkan akun untuk mempertahankan riwayat pembinaan.',
+                ]);
+            }
+
+            $account->delete();
+        });
     }
 }

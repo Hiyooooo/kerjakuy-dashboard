@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-    <h1 data-enter class="mt-2 font-heading text-[40px] leading-tight font-extrabold tracking-tight">{{ $title }}</h1>
+    <h1 data-enter class="mt-2 admin-title">{{ $title }}</h1>
     @if (session('attendance_status'))
         <p role="status" class="mt-4 font-bold text-[#26734d]">{{ session('attendance_status') }}</p>
     @endif
@@ -19,7 +19,7 @@
         @php
             $displayTime = fn ($time) => $time->setTimezone('Asia/Jakarta')->locale('id')->translatedFormat('j M Y, H:i').' WIB';
         @endphp
-        <section class="mt-6 rounded-[22px] border border-line bg-white p-5">
+        <section class="mt-6 admin-panel p-5">
             <h2 class="font-heading text-xl font-extrabold">{{ $record->employee->full_name }} · {{ $record->work_date->locale('id')->translatedFormat('j F Y') }}</h2>
             <div class="mt-4 grid gap-4 sm:grid-cols-2">
                 @foreach (['Masuk' => [$record->scheduled_check_in_at, $record->check_in_at], 'Pulang' => [$record->scheduled_check_out_at, $record->check_out_at]] as $event => [$scheduled, $actual])
@@ -64,7 +64,7 @@
             </div>
             @endcan
         </section>
-        <section class="mt-6 rounded-[22px] border border-line bg-white p-5">
+        <section class="mt-6 admin-panel p-5">
             <h2 class="font-heading text-xl font-extrabold">Verifikasi wajah</h2>
             <dl class="mt-3 grid gap-3 sm:grid-cols-2">
                 @foreach (['check_in' => 'Masuk', 'check_out' => 'Pulang'] as $event => $label)
@@ -103,7 +103,7 @@
     @endif
 
     @if (! $record || ($record->check_in_at && ! $record->check_out_at))
-        <section class="mt-6 max-w-xl rounded-[22px] border border-line bg-white p-5 sm:p-6">
+        <section class="mt-6 max-w-xl admin-panel p-5 sm:p-6">
             @if ($record)
                 <h2 class="mb-3 font-heading text-xl font-extrabold">Catat absensi pulang</h2>
                 <p class="mb-3 text-sm text-muted">Absensi pulang memakai perangkat yang sama dan radius acuan yang tersimpan pada catatan masuk.</p>
@@ -179,9 +179,9 @@
                 @endforeach
                 </fieldset>
                 @endforeach
-                <div class="flex flex-wrap gap-2 border-t border-line pt-4">
-                    <button type="submit" class="min-h-12 rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85">{{ $record ? 'Simpan absensi pulang' : 'Simpan absensi masuk' }}</button>
-                    <a href="{{ route('admin.attendance-records.index') }}" class="inline-flex min-h-12 items-center rounded-[10px] px-4 font-bold hover:bg-paper">Batal</a>
+                <div class="admin-actions">
+                    <button type="submit" class="admin-button admin-button--primary">{{ $record ? 'Simpan absensi pulang' : 'Simpan absensi masuk' }}</button>
+                    <a href="{{ route('admin.attendance-records.index') }}" class="admin-button admin-button--quiet">Batal</a>
                 </div>
             </form>
         </section>

@@ -4,19 +4,19 @@
 
 @section('content')
     <a href="{{ route('admin.employees.edit', $employee) }}" class="inline-flex min-h-11 items-center font-bold underline">Kembali ke data pegawai</a>
-    <div data-enter class="mt-2 flex flex-wrap items-center justify-between gap-4">
+    <div data-enter class="mt-2 admin-page-header">
         <div>
-            <h1 class="font-heading text-[40px] leading-tight font-extrabold tracking-tight">Riwayat penempatan</h1>
+            <h1 class="admin-title">Riwayat penempatan</h1>
             <p class="mt-1 font-bold">{{ $employee->full_name }} · {{ $employee->employee_code }}</p>
         </div>
-        <a href="{{ route('admin.employees.assignments.create', $employee) }}" class="inline-flex min-h-12 items-center rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85">Tambah penempatan</a>
+        <a href="{{ route('admin.employees.assignments.create', $employee) }}" class="admin-button admin-button--primary">Tambah penempatan</a>
     </div>
     @include('admin.employees.profile-nav')
     @if (session('employee_status'))
         <p role="status" class="mt-4 text-[#26734d]">{{ session('employee_status') }}</p>
     @endif
 
-    <div class="mt-6 divide-y divide-line rounded-[22px] border border-line bg-white">
+    <div class="mt-6 divide-y divide-line admin-panel">
         @forelse ($assignments as $assignment)
             @php
                 $start = $assignment->effective_start_date;

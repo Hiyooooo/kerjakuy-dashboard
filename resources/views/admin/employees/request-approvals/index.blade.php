@@ -2,7 +2,7 @@
 @section('title', 'Persetujuan permohonan')
 
 @section('content')
-    <h1 data-enter class="font-heading text-[40px] leading-tight font-extrabold tracking-tight">Persetujuan permohonan</h1>
+    <h1 data-enter class="admin-title">Persetujuan permohonan</h1>
 
     @if (session('approval_status'))
         <p role="status" class="mt-3 text-[#26734d]">{{ session('approval_status') }}</p>
@@ -15,7 +15,7 @@
         </ul>
     @endif
 
-    <form action="{{ route('admin.request-approvals.index') }}" method="GET" class="mt-5 flex flex-wrap items-end gap-3">
+    <form action="{{ route('admin.request-approvals.index') }}" method="GET" class="admin-toolbar flex flex-wrap items-end gap-3">
         <label class="grid gap-1 text-sm font-bold">Jenis permohonan
             <select name="type" class="min-h-11 rounded-[10px] border border-control bg-white px-3">
                 <option value="">Semua jenis</option>
@@ -32,10 +32,10 @@
                 @endforeach
             </select>
         </label>
-        <button class="min-h-11 rounded-[10px] border border-control bg-white px-4 font-bold hover:bg-paper">Terapkan filter</button>
+        <button class="admin-button admin-button--secondary">Terapkan filter</button>
     </form>
 
-    <ul class="mt-5 divide-y divide-line rounded-[22px] border border-line bg-white">
+    <ul class="mt-5 divide-y divide-line admin-panel">
         @forelse ($records as $record)
             @php
                 [$label, $detailRoute] = $types[$record->request_type];
@@ -63,7 +63,7 @@
                             <textarea id="reviewer-note-{{ $record->id }}" name="reviewer_note" maxlength="2000" rows="2" class="rounded-[10px] border border-control px-3 py-2"></textarea>
                             <div class="flex flex-wrap gap-2">
                                 @if ($record->has_detail)
-                                    <button name="decision" value="approved" class="min-h-11 rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85">Setujui permohonan</button>
+                                    <button name="decision" value="approved" class="admin-button admin-button--primary">Setujui permohonan</button>
                                 @endif
                                 <button name="decision" value="rejected" class="min-h-11 rounded-[10px] border border-control px-4 font-bold hover:bg-paper">Tolak permohonan</button>
                                 <button name="decision" value="cancelled" class="min-h-11 rounded-[10px] border border-control px-4 font-bold hover:bg-paper">Batalkan permohonan</button>

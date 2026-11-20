@@ -67,7 +67,11 @@ class AccountController extends Controller
     public function destroy(User $user): RedirectResponse
     {
         Gate::authorize('admin.accounts.change', $user);
-        $this->accounts->delete($user);
+        try {
+            $this->accounts->delete($user);
+        } catch (ValidationException $exception) {
+            return to_route('admin.accounts.edit', $user)->withErrors($exception->errors(), 'accountDeletion');
+        }
 
         return to_route('admin.accounts.index')->with('account_status', 'Pengguna berhasil dihapus.');
     }

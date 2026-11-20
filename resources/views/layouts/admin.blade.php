@@ -11,13 +11,13 @@
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-paper font-sans text-ink">
+<body @class(['min-h-screen bg-paper font-sans text-ink', 'admin-workspace' => ! request()->routeIs('admin.dashboard')])>
     <a href="#konten" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-10 focus:rounded-[10px] focus:bg-white focus:px-4 focus:py-3">
         Lewati ke konten
     </a>
 
     <div class="min-h-screen md:grid md:grid-cols-[15rem_minmax(0,1fr)]">
-        <aside class="border-b border-line bg-white px-[18px] py-4 md:border-r md:border-b-0 md:px-6 md:py-8">
+        <aside class="admin-sidebar border-b border-line bg-white px-[18px] py-4 md:border-r md:border-b-0 md:px-6 md:py-8">
             <div class="flex flex-wrap items-center justify-between gap-3 md:items-start md:gap-8 md:flex-col">
                 <div class="flex items-center gap-3">
                     <img src="{{ asset('icon.svg') }}" alt="" width="36" height="36" class="size-9 shrink-0">
@@ -113,7 +113,7 @@
                     @endphp
                     @foreach ($menuGroups as $groupLabel => $items)
                         <details class="group" @if (isset($items[$activeMenu])) open @endif>
-                            <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-[10px] px-3 text-sm font-extrabold hover:bg-paper [&::-webkit-details-marker]:hidden">
+                            <summary @class(['flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 rounded-[10px] px-3 text-sm font-extrabold hover:bg-paper [&::-webkit-details-marker]:hidden', 'admin-current-group' => isset($items[$activeMenu])])>
                                 {{ $groupLabel }}
                                 <svg aria-hidden="true" class="size-4 shrink-0 group-open:rotate-90" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="m9 6 6 6-6 6"/>
@@ -137,7 +137,7 @@
             </div>
         </aside>
 
-        <div>
+        <div class="min-w-0">
             <header class="border-b border-line bg-white">
                 <div class="mx-auto flex min-h-16 max-w-[1600px] items-center justify-between gap-3 px-[18px] text-sm font-bold text-muted md:px-8 xl:px-12">
                     @hasSection('breadcrumb-parent')

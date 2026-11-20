@@ -27,15 +27,15 @@
 
 @section('content')
     <div class="mx-auto max-w-xl">
-    <h1 data-enter class="font-heading text-3xl leading-tight font-extrabold tracking-tight sm:text-[40px]">{{ $title }}</h1>
+    <h1 data-enter class="admin-title">{{ $title }}</h1>
 
     @if ($resource === 'job-desks' && $positions->isEmpty())
-        <div class="mt-6 max-w-xl rounded-[22px] border border-line bg-white p-6">
+        <div class="mt-6 max-w-xl admin-panel p-6">
             <p class="text-muted">Tambahkan jabatan untuk membuat job desk.</p>
             <a href="{{ route('admin.positions.create') }}" class="mt-3 inline-flex min-h-11 items-center font-bold underline decoration-control/50 underline-offset-4">Tambah jabatan</a>
         </div>
     @else
-    <form method="POST" action="{{ $editing ? route('admin.'.$resource.'.update', [$record, ...$routeFilters]) : route('admin.'.$resource.'.store', $routeFilters) }}" class="mt-6 grid max-w-xl gap-5 rounded-[22px] border border-line bg-white p-6">
+    <form method="POST" action="{{ $editing ? route('admin.'.$resource.'.update', [$record, ...$routeFilters]) : route('admin.'.$resource.'.store', $routeFilters) }}" class="mt-6 grid max-w-xl gap-5 admin-panel admin-form">
         @csrf
         @if ($editing)
             @method('PUT')
@@ -146,15 +146,15 @@
         </div>
         @endif
 
-        <div class="flex flex-wrap gap-2 border-t border-line pt-4">
-            <button type="submit" class="min-h-12 cursor-pointer rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">Simpan {{ Str::lower($label) }}</button>
-            <a href="{{ route('admin.'.$resource.'.index', $routeFilters) }}" class="inline-flex min-h-12 items-center rounded-[10px] px-4 font-bold hover:bg-paper">Batal</a>
+        <div class="admin-actions">
+            <button type="submit" class="admin-button admin-button--primary">Simpan {{ Str::lower($label) }}</button>
+            <a href="{{ route('admin.'.$resource.'.index', $routeFilters) }}" class="admin-button admin-button--quiet">Batal</a>
         </div>
     </form>
     @endif
 
     @if ($editing && ! in_array($resource, ['attendance-methods', 'attendance-locations'], true))
-        <details class="mt-4 max-w-xl rounded-[22px] border border-line bg-white px-6 py-2" @if ($errors->has('delete')) open @endif>
+        <details class="mt-4 max-w-xl admin-panel px-6 py-2" @if ($errors->has('delete')) open @endif>
             <summary class="min-h-11 cursor-pointer py-3 font-bold text-[#b42318]">Hapus {{ Str::lower($label) }}</summary>
             <form method="POST" action="{{ route('admin.'.$resource.'.destroy', [$record, ...$routeFilters]) }}" class="space-y-3 pb-4">
                 @csrf

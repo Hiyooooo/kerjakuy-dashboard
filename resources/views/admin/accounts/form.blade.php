@@ -11,6 +11,7 @@
 
         return is_scalar($value) ? $value : null;
     };
+    $deletionErrors = $errors->getBag('accountDeletion');
     $errors = $restore ? $errors : new \Illuminate\Support\ViewErrorBag;
 @endphp
 @section('title', $editing ? 'Edit akun' : 'Tambah akun')
@@ -20,9 +21,9 @@
 @endsection
 
 @section('content')
-    <h1 data-enter class="mx-auto max-w-xl font-heading text-3xl leading-tight font-extrabold tracking-tight sm:text-[40px]">@yield('title')</h1>
+    <h1 data-enter class="mx-auto max-w-xl admin-title">@yield('title')</h1>
 
-    <form method="POST" action="{{ $editing ? route('admin.accounts.update', $account) : route('admin.accounts.store') }}" class="mx-auto mt-6 grid max-w-xl gap-6 rounded-[22px] border border-line bg-white p-4 sm:p-6">
+    <form method="POST" action="{{ $editing ? route('admin.accounts.update', $account) : route('admin.accounts.store') }}" class="mx-auto mt-6 grid max-w-xl gap-6 admin-panel admin-form">
         @csrf
         @if ($editing)
             @method('PUT')
@@ -123,15 +124,18 @@
             @enderror
         </div>
 
-        <div class="flex flex-wrap items-center gap-2 border-t border-line pt-4">
-            <button type="submit" class="min-h-12 cursor-pointer rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">Simpan akun</button>
-            <a href="{{ route('admin.accounts.index') }}" class="inline-flex min-h-12 items-center rounded-[10px] px-4 font-bold hover:bg-paper">Batal</a>
+        <div class="admin-actions">
+            <button type="submit" class="admin-button admin-button--primary">Simpan akun</button>
+            <a href="{{ route('admin.accounts.index') }}" class="admin-button admin-button--quiet">Batal</a>
         </div>
     </form>
 
     @if ($editing)
-        <details class="mx-auto mt-4 max-w-xl rounded-[22px] border border-line bg-white px-6 py-2">
+        <details class="mx-auto mt-4 max-w-xl admin-panel px-6 py-2" @if ($deletionErrors->any()) open @endif>
             <summary class="min-h-11 cursor-pointer py-3 font-bold text-[#b42318]">Hapus akun</summary>
+            @if ($deletionErrors->any())
+                <p role="alert" class="pb-3 text-sm text-[#b42318]">{{ $deletionErrors->first() }}</p>
+            @endif
             <form method="POST" action="{{ route('admin.accounts.destroy', $account) }}" class="space-y-3 pb-4">
                 @csrf
                 @method('DELETE')

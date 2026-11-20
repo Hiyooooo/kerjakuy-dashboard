@@ -9,10 +9,10 @@
 @section('title', $title)
 
 @section('content')
-    <div data-enter class="flex flex-wrap items-center justify-between gap-4">
-        <h1 class="font-heading text-[40px] leading-tight font-extrabold tracking-tight">{{ $title }}</h1>
+    <div data-enter class="admin-page-header">
+        <h1 class="admin-title">{{ $title }}</h1>
         @unless ($inactive)
-            <a href="{{ route('admin.employees.create') }}" class="inline-flex min-h-12 items-center rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">Tambah pegawai</a>
+            <a href="{{ route('admin.employees.create') }}" class="admin-button admin-button--primary">Tambah pegawai</a>
         @endunless
     </div>
 
@@ -27,12 +27,12 @@
         <p class="mt-1 text-sm text-muted">Menampilkan pegawai dengan status Nonaktif atau Mengundurkan diri pada periode yang berlaku hari ini.</p>
     @endif
 
-    <form method="GET" action="{{ $listingUrl }}" role="search" class="mt-6">
+    <form method="GET" action="{{ $listingUrl }}" role="search" class="admin-toolbar">
         <label for="employee-search" class="block text-sm font-bold">Cari nama atau kode pegawai</label>
         <div class="mt-1 flex flex-wrap items-center gap-2">
             <input id="employee-search" name="search" type="search" value="{{ $search }}" maxlength="150"
                 class="min-h-12 w-full min-w-0 rounded-[10px] border border-control bg-white px-3 sm:w-72">
-            <button type="submit" class="min-h-12 cursor-pointer rounded-[10px] border border-control bg-white px-4 font-bold hover:bg-paper">Cari</button>
+            <button type="submit" class="admin-button admin-button--secondary">Cari</button>
             @if ($search !== '')
                 <a href="{{ $listingUrl }}" class="inline-flex min-h-11 items-center px-2 font-bold underline decoration-control/50 underline-offset-4">Hapus pencarian</a>
             @endif
@@ -44,7 +44,7 @@
     @endif
 
     @if ($employees->isEmpty())
-        <p class="mt-6 rounded-[22px] border border-line bg-white p-6 text-muted">
+        <p class="mt-6 admin-panel p-6 text-muted">
             @if ($inactive)
                 {{ $search === '' ? 'Tidak ada pegawai nonaktif atau mengundurkan diri hari ini.' : 'Tidak ada pegawai nonaktif atau mengundurkan diri yang cocok dengan pencarian ini.' }}
             @else
@@ -52,7 +52,7 @@
             @endif
         </p>
     @else
-        <div class="mt-6 overflow-hidden rounded-[22px] border border-line bg-white">
+        <div class="mt-6 admin-panel admin-table" role="region" aria-label="Daftar pegawai" tabindex="0">
             <table class="w-full table-fixed text-left text-sm">
                 <thead class="border-b border-line bg-paper">
                     <tr>

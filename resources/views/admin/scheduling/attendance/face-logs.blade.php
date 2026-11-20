@@ -4,9 +4,9 @@
 
 @section('content')
     <a href="{{ route('admin.attendance-records.index') }}" class="inline-flex min-h-11 items-center font-bold underline">Kembali ke catatan absensi</a>
-    <h1 data-enter class="mt-2 font-heading text-[40px] leading-tight font-extrabold tracking-tight">Riwayat verifikasi wajah</h1>
+    <h1 data-enter class="mt-2 admin-title">Riwayat verifikasi wajah</h1>
 
-    <form action="{{ route('admin.face-verification-logs.index') }}" method="GET" class="mt-5 flex flex-wrap items-end gap-2">
+    <form action="{{ route('admin.face-verification-logs.index') }}" method="GET" class="admin-toolbar flex flex-wrap items-end gap-2">
         <div>
             <label for="status" class="block text-sm font-bold">Hasil verifikasi</label>
             <select id="status" name="status" class="mt-1 min-h-11 rounded-[10px] border border-control bg-white px-3">
@@ -18,7 +18,7 @@
         <button class="min-h-11 rounded-[10px] border border-control px-4 font-bold hover:bg-paper">Terapkan filter</button>
     </form>
 
-    <ul class="mt-5 divide-y divide-line rounded-[22px] border border-line bg-white">
+    <ul class="mt-5 divide-y divide-line admin-panel">
         @forelse ($logs as $log)
             <li class="flex flex-wrap items-start justify-between gap-3 px-4 py-3">
                 <div class="min-w-0 wrap-anywhere">

@@ -2,11 +2,11 @@
 @section('title', 'Permohonan terlambat')
 
 @section('content')
-    <div class="flex flex-wrap items-center justify-between gap-3">
-        <h1 data-enter class="font-heading text-[40px] leading-tight font-extrabold tracking-tight">Permohonan terlambat</h1>
-        <a href="{{ route('admin.late-requests.create') }}" class="inline-flex min-h-11 items-center rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85">Buat permohonan terlambat</a>
+    <div class="admin-page-header">
+        <h1 data-enter class="admin-title">Permohonan terlambat</h1>
+        <a href="{{ route('admin.late-requests.create') }}" class="admin-button admin-button--primary">Buat permohonan terlambat</a>
     </div>
-    <ul class="mt-6 divide-y divide-line rounded-[22px] border border-line bg-white">
+    <ul class="mt-6 divide-y divide-line admin-panel">
         @forelse ($requests as $request)
             <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
                 <div>

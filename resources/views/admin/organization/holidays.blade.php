@@ -3,15 +3,15 @@
 @section('title', 'Hari libur')
 
 @section('content')
-    <header data-enter class="flex flex-wrap items-start justify-between gap-4">
+    <header data-enter class="admin-page-header">
         <div>
-            <h1 class="font-heading text-3xl leading-tight font-extrabold tracking-tight sm:text-[40px]">Hari libur</h1>
+            <h1 class="admin-title">Hari libur</h1>
             <p class="mt-2 max-w-2xl text-muted">Kelola tanggal libur untuk semua kantor atau satu kantor tertentu.</p>
         </div>
-        <a href="{{ route('admin.holidays.create', $filters) }}" class="inline-flex min-h-12 items-center rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">Tambah libur manual</a>
+        <a href="{{ route('admin.holidays.create', $filters) }}" class="admin-button admin-button--primary">Tambah libur manual</a>
     </header>
 
-    <section aria-labelledby="holiday-import-heading" class="mt-6 rounded-[22px] border border-line bg-white p-5 sm:p-6">
+    <section aria-labelledby="holiday-import-heading" class="mt-6 admin-panel p-5 sm:p-6">
         <h2 id="holiday-import-heading" class="font-heading text-xl font-extrabold">Libur resmi {{ $year }}</h2>
         <p class="mt-1 text-sm text-muted">Impor libur nasional dan cuti bersama untuk semua kantor. Entri resmi diperbarui lewat impor ulang.</p>
         <p class="mt-1 text-sm text-muted">Gunakan cuti bersama sebagai acuan sesuai kebijakan jadwal perusahaan.</p>
@@ -41,7 +41,7 @@
     </section>
 
     @if ($result = session('holiday_import_result'))
-        <div class="mt-4 rounded-[22px] border border-line bg-white px-5 py-3">
+        <div class="mt-4 admin-panel px-5 py-3">
             <p role="status" class="font-bold text-[#26734d]">
                 Impor {{ $result['year'] }} berhasil. {{ count($result['added']) }} ditambahkan, {{ count($result['updated']) }} diperbarui,
                 {{ count($result['withdrawn']) }} ditarik dari daftar resmi, {{ $result['unchanged'] }} sudah sesuai.
@@ -90,18 +90,18 @@
                     </select>
                 </div>
             </div>
-            <button type="submit" class="min-h-12 cursor-pointer rounded-[10px] border border-control bg-white px-4 font-bold hover:bg-paper">Terapkan filter</button>
+            <button type="submit" class="admin-button admin-button--secondary">Terapkan filter</button>
         </form>
         @if (isset($filters['office']))
             <p class="mt-2 text-sm text-muted">Daftar mencakup libur yang berlaku untuk semua kantor dan libur khusus kantor pilihan.</p>
         @endif
 
         @if ($records->isEmpty())
-            <p class="mt-4 rounded-[22px] border border-line bg-white p-5 text-muted">
+            <p class="mt-4 admin-panel p-5 text-muted">
                 Belum ada hari libur untuk pilihan ini. Impor libur resmi atau tambahkan libur manual.
             </p>
         @else
-            <div class="mt-4 overflow-hidden rounded-[22px] border border-line bg-white">
+            <div class="mt-4 admin-panel admin-table" role="region" aria-label="Daftar hari libur" tabindex="0">
                 <table class="w-full table-fixed text-left text-sm">
                     <thead class="border-b border-line bg-paper">
                         <tr>
