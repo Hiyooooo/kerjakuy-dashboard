@@ -48,7 +48,7 @@ class LeaveRequestTest extends TestCase
             ['date' => '2027-02-03', 'duration' => '0.5'],
         ]])->assertSessionHasNoErrors();
         $approved = EmployeeRequest::query()->sole();
-        $approved->forceFill(['status' => 'approved'])->saveOrFail();
+        $approved->recordDecision('approved', $admin, null);
         $this->post($store, [...$common, 'days' => [['date' => '2027-02-04', 'duration' => '0.25']]])->assertSessionHasNoErrors();
 
         $lookup = route('admin.leave-requests.employees', ['search' => 'rina contoh']);

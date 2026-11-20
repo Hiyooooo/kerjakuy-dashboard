@@ -128,8 +128,8 @@ Untuk instalasi baru, isi `KERJAKUY_ADMIN_EMAIL` dan `KERJAKUY_ADMIN_PASSWORD`, 
 - [x] Buat daftar approval admin.
 - [x] Buat aksi setujui, tolak, dan batalkan permohonan.
   - Saat menyetujui cuti, kunci baris pegawai dan jatah terkait, lalu hitung ulang saldo per tahun dengan perhitungan yang sama seperti saat pengajuan. Simpan keputusan dalam transaksi yang sama.
-- [ ] Simpan satu approver, waktu keputusan, serta catatan keputusan.
-- [ ] Terapkan bahwa detail permohonan wajib sesuai jenis request.
+- [x] Simpan satu approver, waktu keputusan, serta catatan keputusan.
+- [x] Terapkan bahwa detail permohonan wajib sesuai jenis request.
 
 **Selesai jika:** seluruh permohonan memiliki status dan satu approver yang jelas, tanpa struktur approval yang terduplikasi.
 
