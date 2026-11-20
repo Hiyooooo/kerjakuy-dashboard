@@ -18,6 +18,7 @@ ERD lengkap dan DBML final disimpan di D:\Coding\Akarindo\10 Website\admin-panel
 
 - Satu `employee` dapat memiliki satu akun `user`; akun admin nonpegawai tidak wajib terhubung ke pegawai.
 - Satu `employee` memiliki satu `employee_identity_details`, banyak riwayat pajak, keluarga, pendidikan, kepegawaian, karir, pelatihan, pembinaan, dan status.
+- `employee_family_members` menyimpan periode tanggungan terbaru. Saat HRD memulai periode baru, periode sebelumnya yang sudah ditutup dipindahkan ke `employee_family_tax_periods` dengan referensi ke anggota keluarga yang sama.
 - Pegawai menggunakan `employee_work_schedule_assignments` untuk jadwal default. `employee_shift_schedules` dipakai untuk override pada tanggal tertentu atau hasil tukar shift.
 - Satu pegawai hanya dapat memiliki satu jadwal harian pada tanggal yang sama dan satu perangkat aktif yang terkunci.
 - `attendance_records` menyimpan snapshot jadwal, lokasi, metode, perangkat, menit keterlambatan, jarak, serta selfie masuk/pulang.

@@ -3,12 +3,12 @@
 @section('title', 'Toleransi wajah')
 
 @section('content')
-    <div data-enter class="flex flex-wrap items-center justify-between gap-4">
+    <div data-enter class="admin-page-header">
         <div>
-            <h1 class="font-heading text-[40px] leading-tight font-extrabold tracking-tight">Toleransi wajah</h1>
+            <h1 class="admin-title">Toleransi wajah</h1>
             <p class="mt-2 text-muted">Atur skor minimum kecocokan wajah untuk setiap periode absensi.</p>
         </div>
-        <a href="{{ route('admin.face-tolerance-policies.create') }}" class="inline-flex min-h-12 items-center rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">Tambah kebijakan</a>
+        <a href="{{ route('admin.face-tolerance-policies.create') }}" class="admin-button admin-button--primary">Tambah kebijakan</a>
     </div>
 
     @if (session('organization_status'))
@@ -16,9 +16,9 @@
     @endif
 
     @if ($policies->isEmpty())
-        <p class="mt-6 rounded-[22px] border border-line bg-white p-6 text-muted">Belum ada kebijakan toleransi wajah.</p>
+        <p class="mt-6 admin-panel p-6 text-muted">Belum ada kebijakan toleransi wajah.</p>
     @else
-        <div class="mt-6 overflow-hidden rounded-[22px] border border-line bg-white">
+        <div class="mt-6 admin-panel admin-table" role="region" aria-label="Daftar kebijakan toleransi wajah" tabindex="0">
             <table class="w-full table-fixed text-left text-sm">
                 <thead class="border-b border-line bg-paper">
                     <tr>

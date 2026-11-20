@@ -2,9 +2,12 @@
 
 use App\Access\Http\Controllers\Admin\AccountController;
 use App\Access\Http\Controllers\Admin\AuthenticationController;
+use App\Employee\EmployeeHistory;
 use App\Employee\Http\Controllers\Admin\EmployeeController;
 use App\Employee\Http\Controllers\Admin\EmployeeEmploymentPeriodController;
 use App\Employee\Http\Controllers\Admin\EmployeeFaceProfileController;
+use App\Employee\Http\Controllers\Admin\EmployeeFamilyMemberController;
+use App\Employee\Http\Controllers\Admin\EmployeeHistoryController;
 use App\Employee\Http\Controllers\Admin\EmployeeIdentityController;
 use App\Employee\Http\Controllers\Admin\EmployeeJobAssignmentController;
 use App\Employee\Http\Controllers\Admin\LateRequestController;
@@ -139,6 +142,21 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'can:admin.employees
     Route::resource('employees', EmployeeController::class)->except(['show', 'destroy']);
     Route::get('employees/{employee}/identity', [EmployeeIdentityController::class, 'edit'])->name('employees.identity.edit');
     Route::put('employees/{employee}/identity', [EmployeeIdentityController::class, 'update'])->name('employees.identity.update');
+    Route::resource('employees.family-members', EmployeeFamilyMemberController::class)
+        ->only(['index', 'create', 'store', 'edit', 'update'])->scoped(['family_member' => 'id']);
+    foreach (EmployeeHistory::cases() as $history) {
+        Route::prefix('employees/{employee}/'.$history->value)->name('employees.'.$history->value.'.')
+            ->controller(EmployeeHistoryController::class)->group(function () use ($history): void {
+                Route::get('/', 'index')->defaults('history', $history->value)->name('index');
+                Route::get('create', 'create')->defaults('history', $history->value)->name('create');
+                Route::post('/', 'store')->defaults('history', $history->value)->name('store');
+                Route::get('{record}/edit', 'edit')->whereNumber('record')->defaults('history', $history->value)->name('edit');
+                Route::put('{record}', 'update')->whereNumber('record')->defaults('history', $history->value)->name('update');
+                if ($history === EmployeeHistory::Training) {
+                    Route::get('{record}/certificate', 'certificate')->whereNumber('record')->name('certificate');
+                }
+            });
+    }
     Route::resource('employees.periods', EmployeeEmploymentPeriodController::class)
         ->only(['index', 'create', 'store', 'edit', 'update'])->scoped(['period' => 'id']);
     Route::resource('employees.assignments', EmployeeJobAssignmentController::class)

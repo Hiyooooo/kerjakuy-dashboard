@@ -135,8 +135,8 @@ Untuk instalasi baru, isi `KERJAKUY_ADMIN_EMAIL` dan `KERJAKUY_ADMIN_PASSWORD`, 
 
 ## Tahap 6 — HRD lanjutan, BPJS, dan pajak
 
-- [ ] Buat data keluarga pegawai sebagai data pendukung tanggungan pajak.
-- [ ] Buat data pendidikan, pelatihan, dan pembinaan pegawai.
+- [x] Buat data keluarga pegawai sebagai data pendukung tanggungan pajak.
+- [x] Buat data pendidikan, pelatihan, dan pembinaan pegawai.
 - [ ] Buat profil pajak pegawai menurut periode berlaku.
 - [ ] Simpan NPWP dan nomor kepesertaan sensitif dalam bentuk terenkripsi dengan hash unik terpisah.
 - [ ] Buat master PTKP dan aturan PKP beserta lapisan tarif.

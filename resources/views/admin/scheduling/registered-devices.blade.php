@@ -3,13 +3,13 @@
 @section('title', 'Perangkat absensi')
 
 @section('content')
-    <h1 data-enter class="font-heading text-[40px] leading-tight font-extrabold tracking-tight">Perangkat absensi</h1>
+    <h1 data-enter class="admin-title">Perangkat absensi</h1>
 
     @if (session('device_status'))
         <p role="status" class="mt-4 font-bold text-[#26734d]">{{ session('device_status') }}</p>
     @endif
 
-    <form method="GET" action="{{ route('admin.registered-devices.index') }}" aria-label="Filter perangkat" class="mt-6 flex flex-wrap items-end gap-3">
+    <form method="GET" action="{{ route('admin.registered-devices.index') }}" aria-label="Filter perangkat" class="admin-toolbar flex flex-wrap items-end gap-3">
         <label class="grid w-full max-w-xs gap-1 text-sm font-bold">Nama atau UUID perangkat
             <input type="search" name="search" maxlength="150" value="{{ $filters['search'] ?? '' }}" class="min-h-11 min-w-0 rounded-[10px] border border-control bg-white px-3">
         </label>
@@ -21,13 +21,13 @@
                 @endforeach
             </select>
         </label>
-        <button class="min-h-11 rounded-[10px] border border-control bg-white px-4 font-bold hover:bg-paper">Terapkan filter</button>
+        <button class="admin-button admin-button--secondary">Terapkan filter</button>
         @if (array_filter($filters))
             <a href="{{ route('admin.registered-devices.index') }}" class="inline-flex min-h-11 items-center px-2 font-bold underline">Reset filter</a>
         @endif
     </form>
 
-    <details class="mt-6 max-w-xl rounded-[22px] border border-line bg-white px-5 py-2 sm:px-6" @if ($errors->any()) open @endif>
+    <details class="mt-6 max-w-xl admin-panel px-5 py-2 sm:px-6" @if ($errors->any()) open @endif>
         <summary class="min-h-11 cursor-pointer py-3 font-bold">Daftarkan perangkat</summary>
         <form method="POST" action="{{ route('admin.registered-devices.store') }}" class="grid gap-4 pb-4">
             @csrf
@@ -53,13 +53,13 @@
                     @enderror
                 </div>
             @endforeach
-            <button type="submit" class="min-h-12 rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 sm:justify-self-start">Daftarkan perangkat</button>
+            <button type="submit" class="admin-button admin-button--primary sm:justify-self-start">Daftarkan perangkat</button>
         </form>
     </details>
 
     <section class="mt-8">
         <h2 class="font-heading text-xl font-extrabold">Daftar perangkat</h2>
-        <div class="mt-3 divide-y divide-line rounded-[22px] border border-line bg-white">
+        <div class="mt-3 divide-y divide-line admin-panel">
             @forelse ($devices as $device)
                 <div class="flex flex-wrap items-start justify-between gap-2 px-4 py-3">
                     <div class="min-w-0 wrap-anywhere">
@@ -72,7 +72,7 @@
                         @endif
                     </div>
                     <div class="flex flex-wrap items-center gap-3">
-                        <p @class(['rounded-full px-2 py-1 text-xs font-bold', 'bg-coral/15 text-[#b42318]' => $device->status === 'blocked', 'bg-green-50 text-[#26734d]' => $device->status === 'registered'])>{{ $device->status === 'blocked' ? 'Diblokir' : 'Terdaftar' }}</p>
+                        <p @class(['admin-status', 'bg-coral/15 text-[#b42318]' => $device->status === 'blocked', 'bg-green-50 text-[#26734d]' => $device->status === 'registered'])>{{ $device->status === 'blocked' ? 'Diblokir' : 'Terdaftar' }}</p>
                         <a href="{{ route('admin.registered-devices.locks.index', $device) }}"
                             aria-label="Penguncian perangkat {{ $device->device_uuid }}"
                             class="inline-flex min-h-11 items-center px-3 text-sm font-bold underline">Kelola penguncian</a>

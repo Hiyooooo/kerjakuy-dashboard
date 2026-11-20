@@ -30,7 +30,7 @@
 
 @section('content')
     <div class="mx-auto max-w-xl">
-    <h1 data-enter class="font-heading text-3xl leading-tight font-extrabold tracking-tight sm:text-[40px]">{{ $title }}</h1>
+    <h1 data-enter class="admin-title">{{ $title }}</h1>
 
     @if ($previousPolicy)
         <p class="mt-2 max-w-xl text-muted">Kebijakan yang dimulai {{ $previousPolicy->effective_start_date->locale('id')->translatedFormat('j F Y') }} akan ditutup sehari sebelum penggantinya mulai berlaku.</p>
@@ -44,7 +44,7 @@
         @endif
     @endif
 
-    <form method="POST" action="{{ $action }}" class="mt-6 grid max-w-xl gap-5 rounded-[22px] border border-line bg-white p-6">
+    <form method="POST" action="{{ $action }}" class="mt-6 grid max-w-xl gap-5 admin-panel admin-form">
         @csrf
         @if ($editing)
             @method('PUT')
@@ -81,9 +81,9 @@
             </div>
         @endforeach
 
-        <div class="flex flex-wrap gap-2 border-t border-line pt-4">
-            <button type="submit" class="min-h-12 cursor-pointer rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85 motion-safe:transition-colors">{{ $previousPolicy ? 'Jadwalkan pengganti' : 'Simpan kebijakan' }}</button>
-            <a href="{{ route('admin.face-tolerance-policies.index') }}" class="inline-flex min-h-12 items-center rounded-[10px] px-4 font-bold hover:bg-paper">Batal</a>
+        <div class="admin-actions">
+            <button type="submit" class="admin-button admin-button--primary">{{ $previousPolicy ? 'Jadwalkan pengganti' : 'Simpan kebijakan' }}</button>
+            <a href="{{ route('admin.face-tolerance-policies.index') }}" class="admin-button admin-button--quiet">Batal</a>
         </div>
     </form>
     </div>

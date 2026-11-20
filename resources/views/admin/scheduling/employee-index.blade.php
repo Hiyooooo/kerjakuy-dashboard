@@ -4,7 +4,7 @@
 
 @section('content')
     <a href="{{ route('admin.employees.index') }}" class="inline-flex min-h-11 items-center font-bold underline">Kembali ke data pegawai</a>
-    <h1 data-enter class="mt-2 font-heading text-[40px] leading-tight font-extrabold tracking-tight">Jadwal kerja pegawai</h1>
+    <h1 data-enter class="mt-2 admin-title">Jadwal kerja pegawai</h1>
     <p class="mt-1 font-bold">{{ $employee->full_name }} · {{ $employee->employee_code }}</p>
     @include('admin.employees.profile-nav')
 
@@ -12,7 +12,7 @@
         <p role="status" class="mt-4 text-[#26734d]">{{ session('scheduling_status') }}</p>
     @endif
 
-    <section class="mt-6 rounded-[22px] border border-line bg-white p-5">
+    <section class="mt-6 admin-panel p-5">
         <h2 class="font-heading text-xl font-extrabold">Jadwal pada tanggal tertentu</h2>
         <form method="GET" action="{{ route('admin.employees.schedules.index', $employee) }}" class="mt-3 flex flex-wrap items-end gap-2">
             <div>
@@ -30,9 +30,9 @@
     <section class="mt-8">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="font-heading text-xl font-extrabold">Jadwal default</h2>
-            <a href="{{ route('admin.employees.schedule-assignments.create', $employee) }}" class="inline-flex min-h-11 items-center rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85">Tambah jadwal default</a>
+            <a href="{{ route('admin.employees.schedule-assignments.create', $employee) }}" class="admin-button admin-button--primary">Tambah jadwal default</a>
         </div>
-        <div class="mt-3 divide-y divide-line rounded-[22px] border border-line bg-white">
+        <div class="mt-3 divide-y divide-line admin-panel">
             @forelse ($assignments as $assignment)
                 <div class="flex items-center justify-between gap-4 px-4 py-3">
                     <div class="min-w-0 wrap-anywhere">
@@ -51,10 +51,10 @@
     <section class="mt-8">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <h2 class="font-heading text-xl font-extrabold">Shift khusus harian</h2>
-            <a href="{{ route('admin.employees.shift-overrides.create', [$employee, 'date' => $date]) }}" class="inline-flex min-h-11 items-center rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85">Tambah shift khusus</a>
+            <a href="{{ route('admin.employees.shift-overrides.create', [$employee, 'date' => $date]) }}" class="admin-button admin-button--primary">Tambah shift khusus</a>
         </div>
         <p class="mt-1 text-sm text-muted">Shift khusus terjadwal menggantikan jadwal default pada tanggal yang dipilih.</p>
-        <div class="mt-3 divide-y divide-line rounded-[22px] border border-line bg-white">
+        <div class="mt-3 divide-y divide-line admin-panel">
             @forelse ($overrides as $override)
                 <div class="flex items-center justify-between gap-4 px-4 py-3">
                     <div class="min-w-0 wrap-anywhere">

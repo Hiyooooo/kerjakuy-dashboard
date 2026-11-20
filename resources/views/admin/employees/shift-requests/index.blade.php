@@ -6,11 +6,11 @@
 @section('title', $title)
 
 @section('content')
-    <div class="flex flex-wrap items-center justify-between gap-3">
-        <h1 data-enter class="font-heading text-[40px] leading-tight font-extrabold tracking-tight">{{ $title }}</h1>
-        <a href="{{ route($prefix.'.create') }}" class="inline-flex min-h-11 items-center rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85">Buat {{ Str::lower($title) }}</a>
+    <div class="admin-page-header">
+        <h1 data-enter class="admin-title">{{ $title }}</h1>
+        <a href="{{ route($prefix.'.create') }}" class="admin-button admin-button--primary">Buat {{ Str::lower($title) }}</a>
     </div>
-    <ul class="mt-6 divide-y divide-line rounded-[22px] border border-line bg-white">
+    <ul class="mt-6 divide-y divide-line admin-panel">
         @forelse ($requests as $record)
             <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
                 <div>

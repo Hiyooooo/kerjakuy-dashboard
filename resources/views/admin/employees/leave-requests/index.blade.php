@@ -2,13 +2,15 @@
 @section('title', 'Permohonan cuti')
 
 @section('content')
-    <h1 data-enter class="font-heading text-[40px] leading-tight font-extrabold tracking-tight">Permohonan cuti</h1>
-    <div class="mt-4 flex flex-wrap gap-3">
-        <a href="{{ route('admin.leave-requests.balances') }}" class="inline-flex min-h-11 items-center rounded-[10px] border border-control px-4 font-bold hover:bg-paper">Lihat saldo cuti</a>
-        <a href="{{ route('admin.leave-requests.create') }}" class="inline-flex min-h-11 items-center rounded-[10px] bg-coral px-4 font-bold hover:bg-coral/85">Buat permohonan cuti</a>
-        <a href="{{ route('admin.leave-requests.entitlements.create') }}" class="inline-flex min-h-11 items-center rounded-[10px] border border-control px-4 font-bold hover:bg-paper">Tambahkan jatah cuti</a>
-    </div>
-    <form method="GET" action="{{ route('admin.leave-requests.index') }}" aria-label="Filter permohonan" class="mt-6 flex flex-wrap items-end gap-3">
+    <header data-enter class="admin-page-header">
+        <h1 class="admin-title">Permohonan cuti</h1>
+        <div class="admin-header-actions flex flex-wrap gap-2">
+            <a href="{{ route('admin.leave-requests.balances') }}" class="admin-button admin-button--secondary">Lihat saldo cuti</a>
+            <a href="{{ route('admin.leave-requests.entitlements.create') }}" class="admin-button admin-button--secondary">Tambahkan jatah cuti</a>
+            <a href="{{ route('admin.leave-requests.create') }}" class="admin-button admin-button--primary">Buat permohonan cuti</a>
+        </div>
+    </header>
+    <form method="GET" action="{{ route('admin.leave-requests.index') }}" aria-label="Filter permohonan" class="admin-toolbar flex flex-wrap items-end gap-3">
         <label class="grid w-full max-w-xs gap-1 text-sm font-bold">Nama, kode pegawai, atau nomor permohonan
             <input type="search" name="search" maxlength="150" value="{{ $filters['search'] ?? '' }}" class="min-h-11 min-w-0 rounded-[10px] border border-control bg-white px-3">
         </label>
@@ -20,13 +22,13 @@
                 @endforeach
             </select>
         </label>
-        <button class="min-h-11 rounded-[10px] border border-control bg-white px-4 font-bold hover:bg-paper">Terapkan filter</button>
+        <button class="admin-button admin-button--secondary">Terapkan filter</button>
         @if (array_filter($filters))
             <a href="{{ route('admin.leave-requests.index') }}" class="inline-flex min-h-11 items-center px-2 font-bold underline">Reset filter</a>
         @endif
     </form>
 
-    <ul class="mt-6 divide-y divide-line rounded-[22px] border border-line bg-white">
+    <ul class="mt-6 divide-y divide-line admin-panel">
         @forelse ($requests as $request)
             <li class="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
                 <div>
@@ -41,7 +43,7 @@
                             @endif
                         @endif
                     </p>
-                    <span @class(['mt-1 inline-block rounded-full px-2 py-1 text-xs font-bold', 'bg-amber/20' => $request->status === 'pending', 'bg-green-50 text-[#26734d]' => $request->status === 'approved', 'bg-paper' => in_array($request->status, ['rejected', 'cancelled'], true)])>
+                    <span @class(['admin-status mt-2', 'bg-amber/20' => $request->status === 'pending', 'bg-green-50 text-[#26734d]' => $request->status === 'approved', 'bg-paper' => in_array($request->status, ['rejected', 'cancelled'], true)])>
                         {{ ['pending' => 'Menunggu persetujuan', 'approved' => 'Disetujui', 'rejected' => 'Ditolak', 'cancelled' => 'Dibatalkan'][$request->status] }}
                     </span>
                 </div>
