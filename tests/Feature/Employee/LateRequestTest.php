@@ -53,10 +53,10 @@ class LateRequestTest extends TestCase
         $attachment = route('admin.late-requests.attachment', $request);
         $this->get($attachment)->assertDownload(basename($detail->attachment_path));
         $this->post($store, $payload)->assertSessionHasErrors('late_date');
-        $request->forceFill(['status' => 'approved'])->saveOrFail();
+        $request->recordDecision('approved', $admin, null);
         $this->post($store, $payload)->assertSessionHasErrors('late_date');
         $this->assertDatabaseCount('requests', 1);
-        $request->forceFill(['status' => 'cancelled'])->saveOrFail();
+        $request->recordDecision('cancelled', $admin, null);
         $this->post($store, $payload)->assertSessionHasNoErrors();
 
         $this->post(route('admin.late-requests.store'), [...$payload, 'late_date' => '2027-01-06'])

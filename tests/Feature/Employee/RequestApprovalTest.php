@@ -17,6 +17,7 @@ class RequestApprovalTest extends TestCase
 
     public function test_queue_filters_and_records_only_one_decision_per_request(): void
     {
+        $this->freezeSecond();
         $admin = $this->hrd();
         $this->actingAs($admin)->withoutVite();
         $late = EmployeeRequest::factory()->create(['request_type' => 'late']);
@@ -30,9 +31,13 @@ class RequestApprovalTest extends TestCase
             ->assertRedirect(route('admin.request-approvals.index'))->assertSessionHasNoErrors();
         $this->assertSame('rejected', $late->refresh()->status);
         $this->assertSame($admin->id, $late->reviewed_by_user_id);
-        $this->assertNotNull($late->reviewed_at);
+        $this->assertSame(now()->toDateTimeString(), $late->reviewed_at->toDateTimeString());
+        $this->assertSame('Perlu bukti tambahan', $late->reviewer_note);
+        $this->travel(1)->minute();
         $this->post($decide, ['decision' => 'cancelled'])->assertSessionHasErrors('approval');
         $this->assertSame('rejected', $late->refresh()->status);
+        $this->assertSame(now()->subMinute()->toDateTimeString(), $late->reviewed_at->toDateTimeString());
+        $this->assertSame('Perlu bukti tambahan', $late->reviewer_note);
         $this->get($index)->assertOk()->assertDontSee($late->request_number);
         $this->get(route('admin.request-approvals.index', ['status' => 'rejected']))
             ->assertOk()->assertSee($late->request_number)->assertSee('Perlu bukti tambahan');
